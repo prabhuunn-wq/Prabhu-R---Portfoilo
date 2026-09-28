@@ -74,16 +74,24 @@ export default function SkillsOrbit() {
 
     if (!wrapper || !orbit) return;
 
+    const counters = orbit.querySelectorAll<HTMLElement>("[data-counter]");
+
     /* ==========================================
        ORBIT ROTATION
+       Orbit rotates +360, every skill rotates -360
+       at the same speed so icons and labels stay upright
     ========================================== */
 
-    const animation = gsap.to(orbit, {
-      rotation: 360,
-      duration: 28,
+    const tl = gsap.timeline({
       repeat: -1,
-      ease: "none",
+      defaults: {
+        ease: "none",
+        duration: 28,
+      },
     });
+
+    tl.to(orbit, { rotation: 360 }, 0);
+    tl.to(counters, { rotation: -360 }, 0);
 
     /* ==========================================
        PAUSE WHEN OFF SCREEN
@@ -91,7 +99,7 @@ export default function SkillsOrbit() {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        animation.paused(!entry.isIntersecting);
+        tl.paused(!entry.isIntersecting);
       },
       {
         rootMargin: "100px 0px",
@@ -102,7 +110,7 @@ export default function SkillsOrbit() {
 
     return () => {
       observer.disconnect();
-      animation.kill();
+      tl.kill();
     };
   }, []);
 
@@ -188,105 +196,116 @@ export default function SkillsOrbit() {
 
       {/* ==========================================
           ROTATING SKILLS
+          Outer wrapper centers (Tailwind only).
+          Inner orbit div is animated by GSAP only.
       ========================================== */}
 
       <div
-        ref={orbitRef}
         className="
-          absolute left-1/2 top-1/2
+          pointer-events-none
+          absolute inset-0
           z-20
-          h-[310px] w-[310px]
-          -translate-x-1/2 -translate-y-1/2
-          will-change-transform
-
-          [--radius:150px]
-
-          sm:h-[360px] sm:w-[360px]
-          sm:[--radius:175px]
-
-          md:h-[500px] md:w-[500px]
-          md:[--radius:225px]
+          flex items-center justify-center
         "
       >
-        {skills.map((skill, index) => {
-          const Icon = skill.icon;
-          const angle = (360 / skills.length) * index;
+        <div
+          ref={orbitRef}
+          className="
+            pointer-events-auto
+            relative
+            h-[310px] w-[310px]
+            will-change-transform
 
-          return (
-            <div
-              key={skill.name}
-              className="
-                absolute left-1/2 top-1/2
-                -translate-x-1/2
-                -translate-y-1/2
-              "
-              style={{
-                transform: `
-                  rotate(${angle}deg)
-                  translateY(calc(var(--radius) * -1))
-                  rotate(-${angle}deg)
-                `,
-              }}
-            >
-              <div className="group flex flex-col items-center">
-                {/* Skill icon */}
+            [--radius:150px]
 
+            sm:h-[360px] sm:w-[360px]
+            sm:[--radius:175px]
+
+            md:h-[500px] md:w-[500px]
+            md:[--radius:225px]
+          "
+        >
+          {skills.map((skill, index) => {
+            const Icon = skill.icon;
+            const angle = (360 / skills.length) * index;
+
+            return (
+              <div
+                key={skill.name}
+                className="absolute left-1/2 top-1/2"
+                style={{
+                  transform: `
+                    translate(-50%, -50%)
+                    rotate(${angle}deg)
+                    translateY(calc(var(--radius) * -1))
+                    rotate(-${angle}deg)
+                  `,
+                }}
+              >
+                {/* GSAP counter-rotates this so content stays upright */}
                 <div
-                  className="
-                    flex
-                    h-11 w-11
-                    items-center justify-center
-                    rounded-full
-                    border border-blue-500/30
-                    bg-[#0b101b]/95
-                    shadow-[0_0_22px_rgba(59,130,246,0.12)]
-                    transition-[border-color,box-shadow]
-                    duration-300
-
-                    sm:h-13 sm:w-13
-
-                    md:h-18 md:w-18
-                    md:shadow-[0_0_30px_rgba(59,130,246,0.12)]
-
-                    group-hover:border-blue-400/70
-                    group-hover:shadow-[0_0_35px_rgba(59,130,246,0.35)]
-                  "
+                  data-counter
+                  className="group flex flex-col items-center"
                 >
-                  <Icon
-                    aria-hidden="true"
+                  {/* Skill icon */}
+
+                  <div
                     className="
-                      h-5 w-5
-                      sm:h-6 sm:w-6
-                      md:h-9 md:w-9
+                      flex
+                      h-11 w-11
+                      items-center justify-center
+                      rounded-full
+                      border border-blue-500/30
+                      bg-[#0b101b]/95
+                      shadow-[0_0_22px_rgba(59,130,246,0.12)]
+                      transition-[border-color,box-shadow]
+                      duration-300
+
+                      sm:h-13 sm:w-13
+
+                      md:h-18 md:w-18
+                      md:shadow-[0_0_30px_rgba(59,130,246,0.12)]
+
+                      group-hover:border-blue-400/70
+                      group-hover:shadow-[0_0_35px_rgba(59,130,246,0.35)]
                     "
-                    style={{
-                      color: skill.color,
-                    }}
-                  />
+                  >
+                    <Icon
+                      aria-hidden="true"
+                      className="
+                        h-5 w-5
+                        sm:h-6 sm:w-6
+                        md:h-9 md:w-9
+                      "
+                      style={{
+                        color: skill.color,
+                      }}
+                    />
+                  </div>
+
+                  {/* Skill name */}
+
+                  <span
+                    className="
+                      mt-1.5
+                      whitespace-nowrap
+                      text-[9px]
+                      font-medium
+                      text-gray-400
+
+                      sm:mt-2
+                      sm:text-[10px]
+
+                      md:text-xs
+                    "
+                  >
+                    {skill.name}
+                  </span>
                 </div>
-
-                {/* Skill name */}
-
-                <span
-                  className="
-                    mt-1.5
-                    whitespace-nowrap
-                    text-[9px]
-                    font-medium
-                    text-gray-400
-
-                    sm:mt-2
-                    sm:text-[10px]
-
-                    md:text-xs
-                  "
-                >
-                  {skill.name}
-                </span>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* ==========================================
@@ -329,11 +348,7 @@ export default function SkillsOrbit() {
           alt="Prabhu R"
           width={1024}
           height={1536}
-          sizes="
-            (max-width: 640px) 145px,
-            (max-width: 768px) 175px,
-            240px
-          "
+          sizes="(max-width: 640px) 145px, (max-width: 768px) 175px, 240px"
           className="
             relative z-10
             h-full w-full

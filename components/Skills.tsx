@@ -127,7 +127,7 @@ export default function Skills() {
             scrollTrigger: {
               trigger: sectionRef.current,
               start: "top 65%",
-              end: "center center",
+              end: "top top",
               scrub: 1,
             },
           },
@@ -147,8 +147,8 @@ export default function Skills() {
             ease: "power2.out",
             scrollTrigger: {
               trigger: sectionRef.current,
-              start: "center 70%",
-              end: "center 50%",
+              start: "top 40%",
+              end: "top 10%",
               scrub: 1,
             },
           },
@@ -171,7 +171,9 @@ export default function Skills() {
         bg-[#08090d]
         px-5 pb-16 pt-28
         sm:px-6
-        md:px-20 md:py-32
+
+        md:flex md:h-screen md:min-h-205 md:flex-col
+        md:px-20 md:pb-8 md:pt-28
       "
     >
       {/* ==========================================
@@ -243,8 +245,10 @@ export default function Skills() {
         ref={titleRef}
         className="
           relative z-10 mx-auto
+          w-full
           max-w-5xl
           text-center
+          md:mx-auto md:shrink-0
           md:text-left
         "
       >
@@ -258,7 +262,8 @@ export default function Skills() {
             text-4xl font-bold leading-[0.95]
             text-white
             sm:text-5xl
-            md:mt-4 md:text-7xl
+            md:mt-3 md:text-6xl
+            lg:text-7xl
           "
         >
           My Tech
@@ -273,7 +278,7 @@ export default function Skills() {
             text-sm leading-6
             text-gray-400
             sm:max-w-xl sm:text-base
-            md:mx-0 md:mt-6
+            md:mx-0 md:mt-4
           "
         >
           Technologies I use to design, build, animate and deploy modern web
@@ -283,6 +288,7 @@ export default function Skills() {
 
       {/* ==========================================
           ORBIT
+          Desktop: takes all remaining height, orbit centered in it
       ========================================== */}
 
       <div
@@ -293,11 +299,14 @@ export default function Skills() {
           -mt-2
           flex
           min-h-[420px]
+          w-full
           items-center
           justify-center
           sm:min-h-[440px]
-          md:-mt-8
-          md:min-h-[500px]
+
+          md:mt-0
+          md:min-h-0
+          md:flex-1
         "
       >
         <div
@@ -305,7 +314,8 @@ export default function Skills() {
             w-full
             scale-[0.90]
             sm:scale-[0.90]
-            md:scale-[0.92]
+            md:scale-[0.85]
+            lg:scale-[0.92]
           "
         >
           {showOrbit && <SkillsOrbit />}
@@ -322,9 +332,11 @@ export default function Skills() {
           relative z-20
           mx-auto
           mt-2
+          w-full
           max-w-5xl
           text-center
-          md:mt-6
+          md:mt-0
+          md:shrink-0
           md:text-left
         "
       >
