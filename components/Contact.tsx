@@ -25,11 +25,12 @@ const hoverTransition =
   "transition-[background-color,border-color,color,box-shadow] duration-300";
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-gray-600 md:bg-black/30 md:backdrop-blur-md " +
+  "w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-gray-600 md:bg-black/30 md:backdrop-blur-md lg:py-2.5 " +
   hoverTransition +
   " focus:border-blue-500/50 focus:bg-blue-500/[0.05] focus:ring-1 focus:ring-blue-500/20";
 
-const labelClass = "mb-2 block text-xs tracking-wider text-gray-500";
+const labelClass =
+  "mb-2 block text-xs tracking-wider text-gray-500 lg:mb-1.5";
 
 const primaryLinkClass =
   "inline-flex items-center justify-center gap-2 rounded-full border border-blue-500/40 bg-blue-500/10 px-6 py-3 text-sm font-medium text-blue-400 opacity-0 " +
@@ -45,6 +46,7 @@ export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const fitRef = useRef<HTMLDivElement>(null);
   const characterWrapRef = useRef<HTMLDivElement>(null);
   const characterRef = useRef<HTMLDivElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
@@ -63,6 +65,52 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+
+  /* ==========================================
+     FIT CONTENT TO SCREEN HEIGHT (DESKTOP)
+     Scales the content down (never up) so the whole
+     contact section fits in one screen.
+     GSAP never touches fitRef.
+  ========================================== */
+
+  useEffect(() => {
+    const el = fitRef.current;
+
+    if (!el) return;
+
+    const TOP_PADDING = 112; // fixed navbar space
+    const BOTTOM_PADDING = 24;
+
+    const update = () => {
+      if (window.innerWidth < 1024) {
+        el.style.removeProperty("--fit");
+        return;
+      }
+
+      const available = window.innerHeight - TOP_PADDING - BOTTOM_PADDING;
+      const natural = el.offsetHeight;
+
+      if (!natural) return;
+
+      const scale = Math.min(1, Math.max(0.6, available / natural));
+
+      el.style.setProperty("--fit", scale.toFixed(3));
+    };
+
+    update();
+
+    window.addEventListener("resize", update);
+    document.fonts?.ready.then(update);
+
+    /* Form success/error messages change the height */
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+
+    return () => {
+      window.removeEventListener("resize", update);
+      observer.disconnect();
+    };
+  }, []);
 
   /* ==========================================
      CONTACT ANIMATIONS
@@ -335,7 +383,7 @@ export default function Contact() {
     <section
       id="contact"
       ref={sectionRef}
-      className="relative min-h-screen overflow-hidden bg-[#05070b] px-6 py-24 md:px-12 md:py-32 lg:px-20"
+      className="relative min-h-screen overflow-hidden bg-[#05070b] px-6 py-24 md:px-12 md:py-32 lg:h-screen lg:min-h-0 lg:px-20 lg:pb-6 lg:pt-28"
     >
       {/* ==========================================
           CINEMATIC BACKGROUND
@@ -386,266 +434,273 @@ export default function Contact() {
 
       {/* ==========================================
           MAIN CONTENT
+          contentRef: animated by GSAP (opacity / y)
+          fitRef:     scaled to fit screen (CSS only)
       ========================================== */}
 
       <div ref={contentRef} className="relative z-10 mx-auto max-w-7xl opacity-0">
-        <div className="grid min-h-175 grid-cols-1 items-center gap-16 lg:grid-cols-[55%_45%]">
-          {/* ==========================================
-              LEFT SIDE
-          ========================================== */}
+        <div ref={fitRef} className="lg:origin-top lg:scale-[var(--fit,1)]">
+          <div className="grid min-h-175 grid-cols-1 items-center gap-16 lg:min-h-0 lg:grid-cols-[55%_45%] lg:gap-8">
+            {/* ==========================================
+                LEFT SIDE
+            ========================================== */}
 
-          <div>
-            <p className="text-xs tracking-[0.35em] text-blue-400 md:text-sm">
-              05 — CONTACT
-            </p>
+            <div>
+              <p className="text-xs tracking-[0.35em] text-blue-400 md:text-sm">
+                05 — CONTACT
+              </p>
 
-            <h2 className="mt-5 text-5xl font-bold leading-[0.9] tracking-tight text-white md:text-7xl lg:text-8xl">
-              Let&apos;s
-              <br />
-              <span className="text-gray-500">Build.</span>
-            </h2>
+              <h2 className="mt-5 text-5xl font-bold leading-[0.9] tracking-tight text-white md:text-7xl lg:mt-3 lg:text-6xl">
+                Let&apos;s
+                <br />
+                <span className="text-gray-500">Build.</span>
+              </h2>
 
-            <p className="mt-8 max-w-xl text-base leading-7 text-gray-300 md:text-lg">
-              Have an idea, project or opportunity? Let&apos;s connect and
-              build something meaningful with modern technology.
-            </p>
+              <p className="mt-8 max-w-xl text-base leading-7 text-gray-300 md:text-lg lg:mt-4 lg:text-base">
+                Have an idea, project or opportunity? Let&apos;s connect and
+                build something meaningful with modern technology.
+              </p>
 
-            {/* SOCIAL BUTTONS */}
+              {/* SOCIAL BUTTONS */}
 
-            <div
-              ref={buttonsRef}
-              className="mt-10 flex flex-col gap-4 sm:flex-row sm:flex-wrap"
-            >
-              <a href={`mailto:${EMAIL}`} className={primaryLinkClass}>
-                Get In Touch
-                <span aria-hidden="true">→</span>
-              </a>
-
-              <a
-                href={GITHUB_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={secondaryLinkClass}
+              <div
+                ref={buttonsRef}
+                className="mt-10 flex flex-col gap-4 sm:flex-row sm:flex-wrap lg:mt-6 lg:gap-3"
               >
-                GitHub
-              </a>
+                <a href={`mailto:${EMAIL}`} className={primaryLinkClass}>
+                  Get In Touch
+                  <span aria-hidden="true">→</span>
+                </a>
 
-              <a
-                href={LINKEDIN_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={secondaryLinkClass}
-              >
-                LinkedIn
-              </a>
+                <a
+                  href={GITHUB_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={secondaryLinkClass}
+                >
+                  GitHub
+                </a>
+
+                <a
+                  href={LINKEDIN_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={secondaryLinkClass}
+                >
+                  LinkedIn
+                </a>
+              </div>
+
+              {/* ==========================================
+                  FORM
+              ========================================== */}
+
+              <div className="mt-14 lg:mt-8">
+                <div className="mb-6 lg:mb-4">
+                  <p className="font-mono text-[10px] tracking-[0.3em] text-blue-400">
+                    START A CONVERSATION
+                  </p>
+
+                  <h3 className="mt-2 text-2xl font-semibold text-white lg:mt-1 lg:text-xl">
+                    Tell me about your project.
+                  </h3>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-3">
+                  {/* HONEYPOT (hidden from real users) */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute left-[-9999px] h-0 w-0 overflow-hidden"
+                  >
+                    <label htmlFor="website">Website</label>
+                    <input
+                      id="website"
+                      name="website"
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                    />
+                  </div>
+
+                  {/* NAME + EMAIL (side by side on desktop) */}
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-3">
+                    {/* NAME */}
+                    <div>
+                      <label htmlFor="name" className={labelClass}>
+                        NAME
+                      </label>
+
+                      <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        autoComplete="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        placeholder="Your name"
+                        required
+                        className={inputClass}
+                      />
+                    </div>
+
+                    {/* EMAIL */}
+                    <div>
+                      <label htmlFor="email" className={labelClass}>
+                        EMAIL
+                      </label>
+
+                      <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        autoComplete="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder="you@example.com"
+                        required
+                        className={inputClass}
+                      />
+                    </div>
+                  </div>
+
+                  {/* MESSAGE */}
+                  <div>
+                    <label htmlFor="message" className={labelClass}>
+                      MESSAGE
+                    </label>
+
+                    <textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      placeholder="Tell me what you're building..."
+                      rows={5}
+                      required
+                      className={inputClass + " resize-none lg:h-24"}
+                    />
+                  </div>
+
+                  {/* SUBMIT */}
+                  <button
+                    type="submit"
+                    disabled={sending}
+                    className={
+                      "group inline-flex w-full items-center justify-center gap-3 rounded-xl border border-blue-500/40 bg-blue-500/10 px-6 py-3.5 text-sm font-medium text-blue-400 lg:py-3 " +
+                      hoverTransition +
+                      " hover:border-blue-400 hover:bg-blue-500/20 hover:text-blue-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
+                    }
+                  >
+                    {sending ? "Sending..." : "Send Message"}
+
+                    {!sending && (
+                      <span
+                        aria-hidden="true"
+                        className="transition-transform duration-300 group-hover:translate-x-1"
+                      >
+                        →
+                      </span>
+                    )}
+                  </button>
+
+                  {/* SUCCESS */}
+                  {submitted && (
+                    <div
+                      role="status"
+                      className="rounded-xl border border-green-500/20 bg-green-500/5 px-4 py-3 text-sm text-green-400"
+                    >
+                      Message sent successfully! I&apos;ll get back to you soon.
+                    </div>
+                  )}
+
+                  {/* ERROR */}
+                  {error && (
+                    <div
+                      role="alert"
+                      className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400"
+                    >
+                      {error}
+                    </div>
+                  )}
+                </form>
+              </div>
+
+              {/* EMAIL */}
+
+              <div className="mt-12 lg:mt-5">
+                <p className="font-mono text-[10px] tracking-[0.3em] text-gray-600">
+                  EMAIL
+                </p>
+
+                <a
+                  href={`mailto:${EMAIL}`}
+                  className="mt-2 inline-block text-sm text-gray-400 transition-colors hover:text-blue-400 lg:mt-1"
+                >
+                  {EMAIL}
+                </a>
+              </div>
             </div>
 
             {/* ==========================================
-                FORM
+                RIGHT / CHARACTER SIDE
             ========================================== */}
 
-            <div className="mt-14">
-              <div className="mb-6">
-                <p className="font-mono text-[10px] tracking-[0.3em] text-blue-400">
-                  START A CONVERSATION
+            <div
+              ref={characterWrapRef}
+              className="relative flex min-h-120 items-center justify-center lg:min-h-0"
+            >
+              {/* CHARACTER GLOW (desktop only) */}
+              <div className="pointer-events-none absolute bottom-[15%] hidden h-70 w-70 rounded-full bg-blue-500/10 blur-[80px] md:block" />
+
+              {/* SPEECH BUBBLE */}
+
+              <div
+                ref={bubbleRef}
+                className="absolute right-[5%] top-[4%] z-30 w-60 rounded-2xl border border-blue-400/20 bg-[#10131b]/95 p-5 opacity-0 shadow-[0_20px_60px_rgba(0,0,0,0.5)] md:right-0 md:w-70 md:bg-[#10131b]/90 md:backdrop-blur-xl lg:top-0 lg:w-64 lg:p-4"
+              >
+                <p className="font-mono text-[10px] tracking-[0.25em] text-blue-400">
+                  PRABHU R
                 </p>
 
-                <h3 className="mt-2 text-2xl font-semibold text-white">
-                  Tell me about your project.
-                </h3>
+                <p className="mt-3 text-sm leading-6 text-gray-300 lg:mt-2 lg:text-[13px]">
+                  Ready to turn ideas into real-world applications.
+                </p>
+
+                <div className="absolute -bottom-2 left-8 h-4 w-4 rotate-45 border-b border-r border-blue-400/20 bg-[#10131b]" />
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* HONEYPOT (hidden from real users) */}
-                <div
-                  aria-hidden="true"
-                  className="absolute left-[-9999px] h-0 w-0 overflow-hidden"
-                >
-                  <label htmlFor="website">Website</label>
-                  <input
-                    id="website"
-                    name="website"
-                    type="text"
-                    tabIndex={-1}
-                    autoComplete="off"
-                    value={website}
-                    onChange={(e) => setWebsite(e.target.value)}
-                  />
-                </div>
+              {/* CHARACTER */}
 
-                {/* NAME */}
-                <div>
-                  <label htmlFor="name" className={labelClass}>
-                    NAME
-                  </label>
-
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    autoComplete="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Your name"
-                    required
-                    className={inputClass}
-                  />
-                </div>
-
-                {/* EMAIL */}
-                <div>
-                  <label htmlFor="email" className={labelClass}>
-                    EMAIL
-                  </label>
-
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="you@example.com"
-                    required
-                    className={inputClass}
-                  />
-                </div>
-
-                {/* MESSAGE */}
-                <div>
-                  <label htmlFor="message" className={labelClass}>
-                    MESSAGE
-                  </label>
-
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    placeholder="Tell me what you're building..."
-                    rows={5}
-                    required
-                    className={inputClass + " resize-none"}
-                  />
-                </div>
-
-                {/* SUBMIT */}
-                <button
-                  type="submit"
-                  disabled={sending}
-                  className={
-                    "group inline-flex w-full items-center justify-center gap-3 rounded-xl border border-blue-500/40 bg-blue-500/10 px-6 py-3.5 text-sm font-medium text-blue-400 " +
-                    hoverTransition +
-                    " hover:border-blue-400 hover:bg-blue-500/20 hover:text-blue-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
-                  }
-                >
-                  {sending ? "Sending..." : "Send Message"}
-
-                  {!sending && (
-                    <span
-                      aria-hidden="true"
-                      className="transition-transform duration-300 group-hover:translate-x-1"
-                    >
-                      →
-                    </span>
-                  )}
-                </button>
-
-                {/* SUCCESS */}
-                {submitted && (
-                  <div
-                    role="status"
-                    className="rounded-xl border border-green-500/20 bg-green-500/5 px-4 py-3 text-sm text-green-400"
-                  >
-                    Message sent successfully! I&apos;ll get back to you soon.
-                  </div>
-                )}
-
-                {/* ERROR */}
-                {error && (
-                  <div
-                    role="alert"
-                    className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400"
-                  >
-                    {error}
-                  </div>
-                )}
-              </form>
-            </div>
-
-            {/* EMAIL */}
-
-            <div className="mt-12">
-              <p className="font-mono text-[10px] tracking-[0.3em] text-gray-600">
-                EMAIL
-              </p>
-
-              <a
-                href={`mailto:${EMAIL}`}
-                className="mt-2 inline-block text-sm text-gray-400 transition-colors hover:text-blue-400"
+              <div
+                ref={characterRef}
+                className="relative z-20 mt-24 h-120 w-70 opacity-0 sm:h-125 sm:w-72 md:h-137.5 md:w-[320px] lg:mt-20 lg:h-105 lg:w-60"
               >
-                {EMAIL}
-              </a>
+                <Image
+                  src="/character.webp"
+                  alt="Prabhu R"
+                  fill
+                  sizes="(max-width: 640px) 280px, (max-width: 1024px) 300px, 240px"
+                  className="object-contain object-bottom drop-shadow-[0_25px_50px_rgba(0,0,0,0.65)]"
+                />
+              </div>
             </div>
           </div>
 
           {/* ==========================================
-              RIGHT / CHARACTER SIDE
+              FOOTER
           ========================================== */}
 
-          <div
-            ref={characterWrapRef}
-            className="relative flex min-h-120 items-center justify-center lg:min-h-150"
-          >
-            {/* CHARACTER GLOW (desktop only) */}
-            <div className="pointer-events-none absolute bottom-[15%] hidden h-70 w-70 rounded-full bg-blue-500/10 blur-[80px] md:block" />
+          <div className="mt-16 flex flex-col gap-4 border-t border-white/10 pt-7 md:flex-row md:items-center md:justify-between lg:mt-6 lg:pt-4">
+            <p className="font-mono text-[10px] tracking-[0.2em] text-gray-600">
+              PRABHU R — FULL-STACK DEVELOPER
+            </p>
 
-            {/* SPEECH BUBBLE */}
-
-            <div
-              ref={bubbleRef}
-              className="absolute right-[5%] top-[4%] z-30 w-60 rounded-2xl border border-blue-400/20 bg-[#10131b]/95 p-5 opacity-0 shadow-[0_20px_60px_rgba(0,0,0,0.5)] md:right-0 md:w-70 md:bg-[#10131b]/90 md:backdrop-blur-xl"
-            >
-              <p className="font-mono text-[10px] tracking-[0.25em] text-blue-400">
-                PRABHU R
-              </p>
-
-              <p className="mt-3 text-sm leading-6 text-gray-300">
-                Ready to turn ideas into real-world applications.
-              </p>
-
-              <div className="absolute -bottom-2 left-8 h-4 w-4 rotate-45 border-b border-r border-blue-400/20 bg-[#10131b]" />
-            </div>
-
-            {/* CHARACTER */}
-
-            <div
-              ref={characterRef}
-              className="relative z-20 mt-24 h-120 w-70 opacity-0 sm:h-125 sm:w-72 md:h-137.5 md:w-[320px]"
-            >
-              <Image
-                src="/character.webp"
-                alt="Prabhu R"
-                fill
-                sizes="(max-width: 640px) 280px, (max-width: 1024px) 300px, 320px"
-                className="object-contain object-bottom drop-shadow-[0_25px_50px_rgba(0,0,0,0.65)]"
-              />
-            </div>
+            <p className="font-mono text-[10px] tracking-[0.2em] text-gray-700">
+              © 2026
+            </p>
           </div>
-        </div>
-
-        {/* ==========================================
-            FOOTER
-        ========================================== */}
-
-        <div className="mt-16 flex flex-col gap-4 border-t border-white/10 pt-7 md:flex-row md:items-center md:justify-between">
-          <p className="font-mono text-[10px] tracking-[0.2em] text-gray-600">
-            PRABHU R — FULL-STACK DEVELOPER
-          </p>
-
-          <p className="font-mono text-[10px] tracking-[0.2em] text-gray-700">
-            © 2026
-          </p>
         </div>
       </div>
     </section>
