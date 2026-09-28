@@ -12,6 +12,7 @@ export default function Hero() {
   const charRef = useRef<HTMLDivElement>(null);
   const heroTextRef = useRef<HTMLDivElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
+  const scrollHintRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const mm = gsap.matchMedia();
@@ -73,6 +74,16 @@ export default function Hero() {
             0,
           );
 
+          // Scroll hint fade out
+          tl.to(
+            scrollHintRef.current,
+            {
+              opacity: 0,
+              ease: "none",
+            },
+            0,
+          );
+
           // About enters
           tl.fromTo(
             aboutRef.current,
@@ -115,6 +126,16 @@ export default function Hero() {
             {
               opacity: 0,
               y: -90,
+              ease: "none",
+            },
+            0,
+          );
+
+          // Scroll hint fade out
+          tl.to(
+            scrollHintRef.current,
+            {
+              opacity: 0,
               ease: "none",
             },
             0,
@@ -185,6 +206,7 @@ export default function Hero() {
 
       {/* ==========================================================
           HERO TEXT
+          (desktop: full-height flex column, content centered)
       ========================================================== */}
 
       <div
@@ -200,7 +222,12 @@ export default function Hero() {
           sm:top-[32%]
 
           md:left-20
-          md:top-1/2
+          md:top-0
+          md:flex
+          md:h-full
+          md:translate-y-0
+          md:flex-col
+          md:justify-center
         "
       >
         {/* Small intro */}
@@ -248,6 +275,7 @@ export default function Hero() {
           className="
             mt-7
             inline-flex
+            w-fit
             items-center
             gap-3
             rounded-full
@@ -337,6 +365,7 @@ export default function Hero() {
 
       {/* ==========================================================
           ABOUT CONTENT
+          (desktop: full-height flex column, content centered)
       ========================================================== */}
 
       <div
@@ -355,9 +384,12 @@ export default function Hero() {
 
           md:left-auto
           md:right-20
-          md:top-1/2
+          md:top-0
+          md:flex
+          md:h-full
           md:w-107.5
-          md:-translate-y-1/2
+          md:flex-col
+          md:justify-center
         "
       >
         {/* Label */}
@@ -487,6 +519,7 @@ export default function Hero() {
       ========================================================== */}
 
       <div
+        ref={scrollHintRef}
         className="
           absolute
           bottom-6
