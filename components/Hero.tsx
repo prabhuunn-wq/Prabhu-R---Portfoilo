@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { scheduleRefresh } from "./HeaderWords";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -163,14 +164,12 @@ export default function Hero() {
       sectionRef,
     );
 
-    // Refresh after fonts/images/page are fully ready
-    const refresh = () => ScrollTrigger.refresh();
-
-    document.fonts?.ready.then(refresh);
-    window.addEventListener("load", refresh);
+    // One shared, debounced refresh (instead of one per section)
+    document.fonts?.ready.then(scheduleRefresh);
+    window.addEventListener("load", scheduleRefresh);
 
     return () => {
-      window.removeEventListener("load", refresh);
+      window.removeEventListener("load", scheduleRefresh);
       mm.revert();
     };
   }, []);
@@ -366,7 +365,7 @@ export default function Hero() {
             alt="Prabhu R"
             width={1024}
             height={1536}
-            priority
+            preload
             fetchPriority="high"
             sizes="(max-width: 640px) 260px,(max-width: 1024px) 384px,450px"
             className="

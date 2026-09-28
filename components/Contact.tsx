@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Words, useWordsZoom, scheduleRefresh } from "./HeaderWords";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -47,6 +48,7 @@ export default function Contact() {
   const backgroundRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const fitRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
   const characterWrapRef = useRef<HTMLDivElement>(null);
   const characterRef = useRef<HTMLDivElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
@@ -65,6 +67,9 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+
+  /* Heading words zoom in from the background, one by one */
+  useWordsZoom(headerRef, "top 75%");
 
   /* ==========================================
      FIT CONTENT TO SCREEN HEIGHT (DESKTOP)
@@ -295,7 +300,7 @@ export default function Contact() {
         );
 
         /* Fonts/images can shift layout; recalc trigger positions */
-        document.fonts?.ready.then(() => ScrollTrigger.refresh());
+        document.fonts?.ready.then(scheduleRefresh);
       }, section);
     });
 
@@ -446,20 +451,25 @@ export default function Contact() {
             ========================================== */}
 
             <div>
-              <p className="text-xs tracking-[0.35em] text-blue-400 md:text-sm">
-                05 — CONTACT
-              </p>
+              {/* HEADING: every word zooms in from the background */}
 
-              <h2 className="mt-5 text-5xl font-bold leading-[0.9] tracking-tight text-white md:text-7xl lg:mt-3 lg:text-6xl">
-                Let&apos;s
-                <br />
-                <span className="text-gray-500">Build.</span>
-              </h2>
+              <div ref={headerRef}>
+                <p className="text-xs tracking-[0.35em] text-blue-400 md:text-sm">
+                  <Words text="05 — CONTACT" />
+                </p>
 
-              <p className="mt-8 max-w-xl text-base leading-7 text-gray-300 md:text-lg lg:mt-4 lg:text-base">
-                Have an idea, project or opportunity? Let&apos;s connect and
-                build something meaningful with modern technology.
-              </p>
+                <h2 className="mt-5 text-5xl font-bold leading-[0.9] tracking-tight text-white md:text-7xl lg:mt-3 lg:text-6xl">
+                  <Words text="Let's" />
+                  <br />
+                  <span className="text-gray-500">
+                    <Words text="Build." />
+                  </span>
+                </h2>
+
+                <p className="mt-8 max-w-xl text-base leading-7 text-gray-300 md:text-lg lg:mt-4 lg:text-base">
+                  <Words text="Have an idea, project or opportunity? Let's connect and build something meaningful with modern technology." />
+                </p>
+              </div>
 
               {/* SOCIAL BUTTONS */}
 

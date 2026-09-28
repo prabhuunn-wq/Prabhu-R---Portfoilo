@@ -128,23 +128,25 @@ export default function Skills() {
           },
         );
 
-        /* Title */
+        /* Title - each line slides in from the left, one by one (desktop + mobile) */
 
         gsap.fromTo(
-          titleRef.current,
+          ".title-line",
           {
             opacity: 0,
-            y: 80,
+            x: -80,
           },
           {
             opacity: 1,
-            y: 0,
-            ease: "power2.out",
+            x: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            stagger: 0.2,
             scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 80%",
-              end: "top 40%",
-              scrub: 1,
+              trigger: titleRef.current,
+              start: "top 65%",
+              toggleActions: "play none none reverse",
+              invalidateOnRefresh: true,
             },
           },
         );
@@ -195,8 +197,20 @@ export default function Skills() {
       }, sectionRef);
     });
 
+    /* Recalculate trigger positions once everything above has loaded */
+    const refresh = () => ScrollTrigger.refresh();
+
+    if (document.readyState === "complete") {
+      refresh();
+    } else {
+      window.addEventListener("load", refresh);
+    }
+
+    document.fonts?.ready.then(refresh);
+
     return () => {
       cancelAnimationFrame(raf);
+      window.removeEventListener("load", refresh);
       ctx?.revert();
     };
   }, []);
@@ -291,7 +305,7 @@ export default function Skills() {
           md:text-left
         "
       >
-        <p className="text-[11px] tracking-[0.35em] text-blue-400 sm:text-sm">
+        <p className="title-line opacity-0 text-[11px] tracking-[0.35em] text-blue-400 sm:text-sm">
           02 — SKILLS
         </p>
 
@@ -305,13 +319,14 @@ export default function Skills() {
             lg:text-7xl
           "
         >
-          My Tech
-          <br />
-          <span className="text-gray-500">Stack.</span>
+          <span className="title-line block opacity-0">My Tech</span>
+          <span className="title-line block text-gray-500 opacity-0">Stack.</span>
         </h2>
 
         <p
           className="
+            title-line
+            opacity-0
             mx-auto mt-5
             max-w-[310px]
             text-sm leading-6

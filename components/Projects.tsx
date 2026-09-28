@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, type MouseEvent } from "react";
+import { Fragment, useEffect, useRef, type MouseEvent } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { scheduleRefresh } from "./HeaderWords";
 import { FiExternalLink } from "react-icons/fi";
 import { FaGithub } from "react-icons/fa";
 
@@ -99,10 +100,30 @@ const projects = [
   },
 ];
 
+/* ==========================================
+    SPLIT TEXT INTO WORDS
+    Each word gets the "header-word" class so
+    GSAP can zoom them in one by one.
+========================================== */
+
+const Words = ({ text }: { text: string }) => (
+  <>
+    {text.split(" ").map((word, i, arr) => (
+      <Fragment key={`${word}-${i}`}>
+        <span className="header-word inline-block opacity-0 will-change-transform">
+          {word}
+        </span>
+        {i < arr.length - 1 ? " " : null}
+      </Fragment>
+    ))}
+  </>
+);
+
 export default function Projects() {
   const sectionRef = useRef<HTMLElement>(null);
 
   const backgroundRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
 
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const charactersRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -151,7 +172,7 @@ export default function Projects() {
   };
 
   /* ==========================================
-      GSAP (unchanged)
+      GSAP
   ========================================== */
 
   useEffect(() => {
@@ -183,6 +204,37 @@ export default function Projects() {
                 start: "top bottom",
                 end: "bottom top",
                 scrub: 1.5,
+              },
+            },
+          );
+        }
+
+        /* ======================================
+            HEADER: words zoom in from the
+            background, one by one
+        ====================================== */
+
+        if (headerRef.current) {
+          gsap.fromTo(
+            ".header-word",
+            {
+              opacity: 0,
+              scale: 0.3,
+              filter: "blur(12px)",
+              transformOrigin: "50% 50%",
+            },
+            {
+              opacity: 1,
+              scale: 1,
+              filter: "blur(0px)",
+              duration: 0.9,
+              ease: "power3.out",
+              stagger: 0.08,
+              scrollTrigger: {
+                trigger: headerRef.current,
+                start: "top 80%",
+                toggleActions: "play none none reverse",
+                invalidateOnRefresh: true,
               },
             },
           );
@@ -285,12 +337,22 @@ export default function Projects() {
         });
 
         /* Fonts/images can shift layout; recalc trigger positions */
-        document.fonts?.ready.then(() => ScrollTrigger.refresh());
+        document.fonts?.ready.then(scheduleRefresh);
       }, section);
     });
 
+    /* Recalculate trigger positions once the page has fully loaded */
+    const refresh = scheduleRefresh;
+
+    if (document.readyState === "complete") {
+      refresh();
+    } else {
+      window.addEventListener("load", refresh);
+    }
+
     return () => {
       cancelAnimationFrame(raf);
+      window.removeEventListener("load", refresh);
       ctx?.revert();
     };
   }, []);
@@ -341,22 +403,25 @@ export default function Projects() {
 
       {/* ==========================================
           HEADER
+          Every word is wrapped in a span.header-word
+          and zooms in from the background.
       ========================================== */}
 
-      <div className="relative z-10 mx-auto max-w-6xl">
+      <div ref={headerRef} className="relative z-10 mx-auto max-w-6xl">
         <p className="text-sm tracking-[0.35em] text-blue-400">
-          03 — PROJECTS
+          <Words text="03 — PROJECTS" />
         </p>
 
         <h2 className="mt-5 text-5xl font-bold leading-[0.95] tracking-tight text-white md:mt-3 md:text-5xl lg:text-6xl">
-          Things I&apos;ve
+          <Words text="Things I've" />
           <br />
-          <span className="text-gray-500">Built.</span>
+          <span className="text-gray-500">
+            <Words text="Built." />
+          </span>
         </h2>
 
         <p className="mt-7 max-w-xl text-base leading-7 text-gray-400 md:mt-4 md:text-sm">
-          Real-world applications built across frontend, backend, databases
-          and third-party integrations.
+          <Words text="Real-world applications built across frontend, backend, databases and third-party integrations." />
         </p>
       </div>
 

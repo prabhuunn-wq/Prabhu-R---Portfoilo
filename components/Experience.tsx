@@ -1,16 +1,37 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { scheduleRefresh } from "./HeaderWords";
 
 gsap.registerPlugin(ScrollTrigger);
+
+/* ==========================================
+    SPLIT TEXT INTO WORDS
+    Each word gets the "header-word" class so
+    GSAP can zoom them in one by one.
+========================================== */
+
+const Words = ({ text }: { text: string }) => (
+  <>
+    {text.split(" ").map((word, i, arr) => (
+      <Fragment key={`${word}-${i}`}>
+        <span className="header-word inline-block opacity-0 will-change-transform">
+          {word}
+        </span>
+        {i < arr.length - 1 ? " " : null}
+      </Fragment>
+    ))}
+  </>
+);
 
 export default function Experience() {
   const sectionRef = useRef<HTMLElement>(null);
 
   const backgroundRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
   const characterRef = useRef<HTMLDivElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
 
@@ -62,7 +83,7 @@ export default function Experience() {
   }, []);
 
   /* ==========================================
-     ANIMATIONS (unchanged)
+     ANIMATIONS
   ========================================== */
 
   useEffect(() => {
@@ -85,6 +106,7 @@ export default function Experience() {
     const raf = requestAnimationFrame(() => {
       ctx = gsap.context(() => {
         const background = backgroundRef.current;
+        const header = headerRef.current;
         const character = characterRef.current;
         const bubble = bubbleRef.current;
         const banking = bankingRef.current;
@@ -93,6 +115,7 @@ export default function Experience() {
 
         if (
           !background ||
+          !header ||
           !character ||
           !bubble ||
           !banking ||
@@ -101,6 +124,37 @@ export default function Experience() {
         ) {
           return;
         }
+
+        /* ==========================================
+           HEADING: words zoom in from the background,
+           one by one (desktop + mobile).
+           Kept OUTSIDE the pinned timeline so it plays
+           on its own when the heading comes into view.
+        ========================================== */
+
+        gsap.fromTo(
+          ".header-word",
+          {
+            opacity: 0,
+            scale: 0.3,
+            filter: "blur(12px)",
+            transformOrigin: "50% 50%",
+          },
+          {
+            opacity: 1,
+            scale: 1,
+            filter: "blur(0px)",
+            duration: 0.9,
+            ease: "power3.out",
+            stagger: 0.08,
+            scrollTrigger: {
+              trigger: header,
+              start: "top 80%",
+              toggleActions: "play none none reverse",
+              invalidateOnRefresh: true,
+            },
+          },
+        );
 
         const mm = gsap.matchMedia();
 
@@ -366,12 +420,22 @@ export default function Experience() {
         );
 
         /* Fonts/images can shift layout; recalc trigger positions */
-        document.fonts?.ready.then(() => ScrollTrigger.refresh());
+        document.fonts?.ready.then(scheduleRefresh);
       }, section);
     });
 
+    /* Recalculate trigger positions once the page has fully loaded */
+    const refresh = scheduleRefresh;
+
+    if (document.readyState === "complete") {
+      refresh();
+    } else {
+      window.addEventListener("load", refresh);
+    }
+
     return () => {
       cancelAnimationFrame(raf);
+      window.removeEventListener("load", refresh);
       ctx?.revert();
     };
   }, []);
@@ -435,22 +499,25 @@ export default function Experience() {
         ref={fitRef}
         className="relative z-10 mx-auto max-w-5xl lg:max-w-6xl lg:origin-top lg:scale-[var(--fit,1)]"
       >
-        {/* HEADING */}
+        {/* HEADING
+            Every word is wrapped in a span.header-word
+            and zooms in from the background. */}
 
-        <div className="mb-12 md:mb-16 lg:mb-8">
+        <div ref={headerRef} className="mb-12 md:mb-16 lg:mb-8">
           <p className="text-xs tracking-[0.35em] text-blue-400 md:text-sm">
-            04 — EXPERIENCE
+            <Words text="04 — EXPERIENCE" />
           </p>
 
           <h2 className="mt-4 text-5xl font-bold leading-[0.9] tracking-tight text-white md:text-7xl lg:mt-3 lg:text-6xl">
-            My
+            <Words text="My" />
             <br />
-            <span className="text-gray-500">Journey.</span>
+            <span className="text-gray-500">
+              <Words text="Journey." />
+            </span>
           </h2>
 
           <p className="mt-6 max-w-xl text-sm leading-7 text-gray-300 md:text-base lg:mt-4">
-            A journey from banking operations to building modern full-stack
-            applications.
+            <Words text="A journey from banking operations to building modern full-stack applications." />
           </p>
         </div>
 
