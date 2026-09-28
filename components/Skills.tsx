@@ -18,8 +18,47 @@ export default function Skills() {
   const orbitRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
+  const orbitScaleRef = useRef<HTMLDivElement>(null);
 
   const [showOrbit, setShowOrbit] = useState(false);
+
+  /* ==========================================
+     FIT ORBIT TO AVAILABLE HEIGHT (DESKTOP)
+     Measures the space left for the orbit and
+     sets --orbit-scale so it never gets cut off
+  ========================================== */
+
+  useEffect(() => {
+    const container = orbitRef.current;
+    const inner = orbitScaleRef.current;
+
+    if (!container || !inner) return;
+
+    const NATURAL_HEIGHT = 600; // orbit + icons + label at scale 1
+
+    const update = () => {
+      if (window.innerWidth < 768) {
+        inner.style.removeProperty("--orbit-scale");
+        return;
+      }
+
+      const available = container.clientHeight;
+      const scale = Math.min(1, Math.max(0.5, (available - 8) / NATURAL_HEIGHT));
+
+      inner.style.setProperty("--orbit-scale", scale.toFixed(3));
+    };
+
+    update();
+
+    const observer = new ResizeObserver(update);
+    observer.observe(container);
+    window.addEventListener("resize", update);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
 
   /* ==========================================
      LOAD ORBIT WHEN NEAR VIEWPORT
@@ -310,12 +349,12 @@ export default function Skills() {
         "
       >
         <div
+          ref={orbitScaleRef}
           className="
             w-full
             scale-[0.90]
             sm:scale-[0.90]
-            md:scale-[0.85]
-            lg:scale-[0.92]
+            md:scale-[var(--orbit-scale,0.8)]
           "
         >
           {showOrbit && <SkillsOrbit />}
