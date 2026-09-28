@@ -74,7 +74,10 @@ export default function SkillsOrbit() {
 
     if (!wrapper || !orbit) return;
 
-    /* Rotation (unchanged) */
+    /* ==========================================
+       ORBIT ROTATION
+    ========================================== */
+
     const animation = gsap.to(orbit, {
       rotation: 360,
       duration: 28,
@@ -82,13 +85,17 @@ export default function SkillsOrbit() {
       ease: "none",
     });
 
-    /* Only spin while the orbit is on screen (saves CPU/GPU when scrolled away).
-       It resumes from the same angle, so the motion looks identical. */
+    /* ==========================================
+       PAUSE WHEN OFF SCREEN
+    ========================================== */
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         animation.paused(!entry.isIntersecting);
       },
-      { rootMargin: "100px 0px" },
+      {
+        rootMargin: "100px 0px",
+      },
     );
 
     observer.observe(wrapper);
@@ -102,39 +109,104 @@ export default function SkillsOrbit() {
   return (
     <div
       ref={wrapperRef}
-      className="relative mx-auto h-140 w-full max-w-175 sm:h-150"
+      className="
+        relative mx-auto
+        h-[390px] w-full
+        max-w-[430px]
+        sm:h-[430px]
+        sm:max-w-[520px]
+        md:h-[560px]
+        md:max-w-[700px]
+      "
     >
-      {/* =========================
-          BACKGROUND GLOW (desktop only)
-      ========================== */}
+      {/* ==========================================
+          CENTER BLUE GLOW
+      ========================================== */}
 
-      <div className="pointer-events-none absolute left-1/2 top-1/2 hidden h-100 w-100 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/10 blur-[80px] md:block" />
+      <div
+        className="
+          pointer-events-none
+          absolute left-1/2 top-1/2
+          h-56 w-56
+          -translate-x-1/2 -translate-y-1/2
+          rounded-full
+          bg-blue-500/10
+          blur-[55px]
+          sm:h-72 sm:w-72
+          md:block md:h-100 md:w-100 md:blur-[80px]
+        "
+      />
 
-      {/* =========================
+      {/* ==========================================
           OUTER ORBIT RING
-      ========================== */}
+      ========================================== */}
 
-      <div className="absolute left-1/2 top-1/2 h-125 w-125 -translate-x-1/2 -translate-y-1/2 rounded-full border border-blue-500/20 shadow-[0_0_60px_rgba(59,130,246,0.08)]" />
+      <div
+        className="
+          absolute left-1/2 top-1/2
+          h-[310px] w-[310px]
+          -translate-x-1/2 -translate-y-1/2
+          rounded-full
+          border border-blue-500/20
+          shadow-[0_0_40px_rgba(59,130,246,0.08)]
+          sm:h-[360px] sm:w-[360px]
+          md:h-[500px] md:w-[500px]
+        "
+      />
 
-      {/* =========================
+      {/* ==========================================
           MIDDLE ORBIT RING
-      ========================== */}
+      ========================================== */}
 
-      <div className="absolute left-1/2 top-1/2 h-105 w-105 -translate-x-1/2 -translate-y-1/2 rounded-full border border-blue-400/10" />
+      <div
+        className="
+          absolute left-1/2 top-1/2
+          h-[260px] w-[260px]
+          -translate-x-1/2 -translate-y-1/2
+          rounded-full
+          border border-blue-400/10
+          sm:h-[310px] sm:w-[310px]
+          md:h-[420px] md:w-[420px]
+        "
+      />
 
-      {/* =========================
+      {/* ==========================================
           INNER ORBIT RING
-      ========================== */}
+      ========================================== */}
 
-      <div className="absolute left-1/2 top-1/2 h-75 w-75 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/5" />
+      <div
+        className="
+          absolute left-1/2 top-1/2
+          h-[190px] w-[190px]
+          -translate-x-1/2 -translate-y-1/2
+          rounded-full
+          border border-white/5
+          sm:h-[230px] sm:w-[230px]
+          md:h-[300px] md:w-[300px]
+        "
+      />
 
-      {/* =========================
+      {/* ==========================================
           ROTATING SKILLS
-      ========================== */}
+      ========================================== */}
 
       <div
         ref={orbitRef}
-        className="absolute left-1/2 top-1/2 z-20 h-75 w-75 -translate-x-1/2 -translate-y-1/2 will-change-transform [--radius:130px] sm:h-100 sm:w-100 sm:[--radius:180px] md:h-125 md:w-125 md:[--radius:230px]"
+        className="
+          absolute left-1/2 top-1/2
+          z-20
+          h-[310px] w-[310px]
+          -translate-x-1/2 -translate-y-1/2
+          will-change-transform
+
+          [--radius:150px]
+
+          sm:h-[360px] sm:w-[360px]
+          sm:[--radius:175px]
+
+          md:h-[500px] md:w-[500px]
+          md:[--radius:225px]
+        "
       >
         {skills.map((skill, index) => {
           const Icon = skill.icon;
@@ -143,24 +215,72 @@ export default function SkillsOrbit() {
           return (
             <div
               key={skill.name}
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+              className="
+                absolute left-1/2 top-1/2
+                -translate-x-1/2
+                -translate-y-1/2
+              "
               style={{
-                transform: `rotate(${angle}deg) translateY(calc(var(--radius) * -1)) rotate(-${angle}deg)`,
+                transform: `
+                  rotate(${angle}deg)
+                  translateY(calc(var(--radius) * -1))
+                  rotate(-${angle}deg)
+                `,
               }}
             >
-              {/* Skill Logo */}
               <div className="group flex flex-col items-center">
-                {/* No backdrop-blur here: blur on 9 constantly rotating
-                    layers is very expensive. A more opaque bg looks the same. */}
-                <div className="flex h-13 w-13 items-center justify-center rounded-full border border-blue-500/30 bg-[#0b101b]/95 shadow-[0_0_30px_rgba(59,130,246,0.12)] transition-[border-color,box-shadow] duration-300 group-hover:border-blue-400/70 group-hover:shadow-[0_0_35px_rgba(59,130,246,0.35)] sm:h-15 sm:w-15 md:h-18 md:w-18">
+                {/* Skill icon */}
+
+                <div
+                  className="
+                    flex
+                    h-11 w-11
+                    items-center justify-center
+                    rounded-full
+                    border border-blue-500/30
+                    bg-[#0b101b]/95
+                    shadow-[0_0_22px_rgba(59,130,246,0.12)]
+                    transition-[border-color,box-shadow]
+                    duration-300
+
+                    sm:h-13 sm:w-13
+
+                    md:h-18 md:w-18
+                    md:shadow-[0_0_30px_rgba(59,130,246,0.12)]
+
+                    group-hover:border-blue-400/70
+                    group-hover:shadow-[0_0_35px_rgba(59,130,246,0.35)]
+                  "
+                >
                   <Icon
                     aria-hidden="true"
-                    className="h-6 w-6 sm:h-7 sm:w-7 md:h-9 md:w-9"
-                    style={{ color: skill.color }}
+                    className="
+                      h-5 w-5
+                      sm:h-6 sm:w-6
+                      md:h-9 md:w-9
+                    "
+                    style={{
+                      color: skill.color,
+                    }}
                   />
                 </div>
 
-                <span className="mt-2 whitespace-nowrap text-xs font-medium text-gray-400">
+                {/* Skill name */}
+
+                <span
+                  className="
+                    mt-1.5
+                    whitespace-nowrap
+                    text-[9px]
+                    font-medium
+                    text-gray-400
+
+                    sm:mt-2
+                    sm:text-[10px]
+
+                    md:text-xs
+                  "
+                >
                   {skill.name}
                 </span>
               </div>
@@ -169,26 +289,94 @@ export default function SkillsOrbit() {
         })}
       </div>
 
-      {/* CENTER CHARACTER */}
-      <div className="absolute left-1/2 top-1/2 z-20 h-52 w-36 -translate-x-1/2 -translate-y-1/2 sm:h-72 sm:w-48 md:h-96 md:w-60">
-        {/* Character glow (desktop only) */}
-        <div className="pointer-events-none absolute left-1/2 top-1/2 hidden h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/10 blur-[50px] sm:h-56 sm:w-56 md:block md:h-64 md:w-64" />
+      {/* ==========================================
+          CENTER CHARACTER
+      ========================================== */}
+
+      <div
+        className="
+          absolute left-1/2 top-1/2
+          z-20
+          h-[210px] w-[145px]
+          -translate-x-1/2 -translate-y-1/2
+
+          sm:h-[260px] sm:w-[175px]
+
+          md:h-96 md:w-60
+        "
+      >
+        {/* Character glow */}
+
+        <div
+          className="
+            pointer-events-none
+            absolute left-1/2 top-1/2
+            h-40 w-40
+            -translate-x-1/2 -translate-y-1/2
+            rounded-full
+            bg-blue-500/10
+            blur-[45px]
+
+            sm:h-48 sm:w-48
+
+            md:h-64 md:w-64
+            md:blur-[50px]
+          "
+        />
 
         <Image
           src="/character.webp"
           alt="Prabhu R"
           width={1024}
           height={1536}
-          sizes="(max-width: 640px) 144px, (max-width: 768px) 190px, 240px"
-          className="relative z-10 h-full w-full object-contain object-center drop-shadow-[0_0_30px_rgba(59,130,246,0.18)]"
+          sizes="
+            (max-width: 640px) 145px,
+            (max-width: 768px) 175px,
+            240px
+          "
+          className="
+            relative z-10
+            h-full w-full
+            object-contain object-center
+            drop-shadow-[0_0_25px_rgba(59,130,246,0.18)]
+          "
         />
       </div>
 
-      {/* =========================
+      {/* ==========================================
           CENTER LABEL
-      ========================== */}
+      ========================================== */}
 
-      <div className="absolute -bottom-13.5 left-1/2 z-30 -translate-x-1/2 whitespace-nowrap rounded-full border border-blue-500/30 bg-[#08090d]/90 px-6 py-2.5 font-mono text-[10px] tracking-[0.3em] text-blue-400 shadow-[0_0_25px_rgba(59,130,246,0.1)] backdrop-blur-md">
+      <div
+        className="
+          absolute
+          left-1/2
+          bottom-[-8px]
+          z-30
+          -translate-x-1/2
+          whitespace-nowrap
+          rounded-full
+          border border-blue-500/30
+          bg-[#08090d]/90
+          px-4 py-2
+          font-mono
+          text-[8px]
+          tracking-[0.25em]
+          text-blue-400
+          shadow-[0_0_20px_rgba(59,130,246,0.1)]
+
+          sm:bottom-[-10px]
+          sm:px-5
+          sm:py-2.5
+          sm:text-[9px]
+
+          md:bottom-[-13.5px]
+          md:px-6
+          md:py-2.5
+          md:text-[10px]
+          md:tracking-[0.3em]
+        "
+      >
         FULL-STACK DEVELOPER
       </div>
     </div>

@@ -8,8 +8,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Orbit code is split out of the main bundle and only loaded when needed
-const SkillsOrbit = dynamic(() => import("./SkillsOrbit"), { ssr: false });
+const SkillsOrbit = dynamic(() => import("./SkillsOrbit"), {
+  ssr: false,
+});
 
 export default function Skills() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -21,12 +22,12 @@ export default function Skills() {
   const [showOrbit, setShowOrbit] = useState(false);
 
   /* ==========================================
-     MOUNT THE ORBIT ONLY WHEN IT'S NEAR THE VIEWPORT
-     (starts loading 500px before it's visible)
+     LOAD ORBIT WHEN NEAR VIEWPORT
   ========================================== */
 
   useEffect(() => {
     const el = orbitRef.current;
+
     if (!el) return;
 
     const observer = new IntersectionObserver(
@@ -36,7 +37,9 @@ export default function Skills() {
           observer.disconnect();
         }
       },
-      { rootMargin: "500px 0px" },
+      {
+        rootMargin: "500px 0px",
+      },
     );
 
     observer.observe(el);
@@ -44,13 +47,20 @@ export default function Skills() {
     return () => observer.disconnect();
   }, []);
 
-  /* Orbit may change the page height once it mounts */
+  /* ==========================================
+     REFRESH SCROLLTRIGGER AFTER ORBIT LOAD
+  ========================================== */
+
   useEffect(() => {
-    if (showOrbit) ScrollTrigger.refresh();
+    if (showOrbit) {
+      requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+      });
+    }
   }, [showOrbit]);
 
   /* ==========================================
-     ANIMATIONS (unchanged)
+     GSAP ANIMATIONS
   ========================================== */
 
   useEffect(() => {
@@ -58,6 +68,8 @@ export default function Skills() {
 
     const raf = requestAnimationFrame(() => {
       ctx = gsap.context(() => {
+        /* Background */
+
         gsap.fromTo(
           bgRef.current,
           {
@@ -77,9 +89,14 @@ export default function Skills() {
           },
         );
 
+        /* Title */
+
         gsap.fromTo(
           titleRef.current,
-          { opacity: 0, y: 80 },
+          {
+            opacity: 0,
+            y: 80,
+          },
           {
             opacity: 1,
             y: 0,
@@ -93,9 +110,15 @@ export default function Skills() {
           },
         );
 
+        /* Orbit */
+
         gsap.fromTo(
           orbitRef.current,
-          { opacity: 0, scale: 0.65, y: 100 },
+          {
+            opacity: 0,
+            scale: 0.65,
+            y: 100,
+          },
           {
             opacity: 1,
             scale: 1,
@@ -110,9 +133,14 @@ export default function Skills() {
           },
         );
 
+        /* Bottom hint */
+
         gsap.fromTo(
           hintRef.current,
-          { opacity: 0, y: 30 },
+          {
+            opacity: 0,
+            y: 30,
+          },
           {
             opacity: 1,
             y: 0,
@@ -138,20 +166,26 @@ export default function Skills() {
     <section
       id="skills"
       ref={sectionRef}
-      className="relative min-h-screen overflow-hidden bg-[#08090d] px-6 pb-24 pt-32 md:px-20 md:py-32"
+      className="
+        relative min-h-screen overflow-hidden
+        bg-[#08090d]
+        px-5 pb-16 pt-28
+        sm:px-6
+        md:px-20 md:py-32
+      "
     >
       {/* ==========================================
-          CINEMATIC SKILLS BACKGROUND
-          next/image: optimized + lazy-loaded (was a CSS background).
-          Tip: convert skills-background.png to .webp for a smaller file.
+          BACKGROUND
       ========================================== */}
 
       <div
         ref={bgRef}
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 will-change-transform"
+        className="
+          pointer-events-none absolute inset-0 z-0
+          will-change-transform
+        "
       >
-        {/* Background image */}
         <Image
           src="/skills-background.png"
           alt=""
@@ -161,61 +195,154 @@ export default function Skills() {
           className="object-cover object-center"
         />
 
-        {/* Dark cinematic overlay */}
+        {/* Dark overlay */}
         <div className="absolute inset-0 bg-[#03060d]/60" />
 
-        {/* Center blue atmosphere */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(37,99,235,0.12),transparent_42%)]" />
+        {/* Center glow */}
+        <div
+          className="
+            absolute inset-0
+            bg-[radial-gradient(circle_at_50%_50%,rgba(37,99,235,0.12),transparent_42%)]
+          "
+        />
 
         {/* Top fade */}
-        <div className="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-[#08090d] to-transparent" />
+        <div
+          className="
+            absolute inset-x-0 top-0
+            h-32
+            bg-linear-to-b from-[#08090d] to-transparent
+            md:h-40
+          "
+        />
 
         {/* Bottom fade */}
-        <div className="absolute inset-x-0 bottom-0 h-48 bg-linear-to-t from-[#08090d] to-transparent" />
+        <div
+          className="
+            absolute inset-x-0 bottom-0
+            h-40
+            bg-linear-to-t from-[#08090d] to-transparent
+            md:h-48
+          "
+        />
 
-        {/* Cinematic vignette */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,rgba(0,0,0,0.65)_100%)]" />
+        {/* Vignette */}
+        <div
+          className="
+            absolute inset-0
+            bg-[radial-gradient(circle_at_center,transparent_20%,rgba(0,0,0,0.65)_100%)]
+          "
+        />
       </div>
 
-      {/* Section title */}
+      {/* ==========================================
+          SECTION TITLE
+      ========================================== */}
+
       <div
         ref={titleRef}
-        className="relative z-10 mx-auto max-w-5xl text-center md:text-left"
+        className="
+          relative z-10 mx-auto
+          max-w-5xl
+          text-center
+          md:text-left
+        "
       >
-        <p className="text-sm tracking-[0.35em] text-blue-400">
+        <p className="text-[11px] tracking-[0.35em] text-blue-400 sm:text-sm">
           02 — SKILLS
         </p>
 
-        <h2 className="mt-4 text-5xl font-bold leading-[0.95] text-white md:text-7xl">
+        <h2
+          className="
+            mt-3
+            text-4xl font-bold leading-[0.95]
+            text-white
+            sm:text-5xl
+            md:mt-4 md:text-7xl
+          "
+        >
           My Tech
           <br />
           <span className="text-gray-500">Stack.</span>
         </h2>
 
-        <p className="mx-auto mt-6 max-w-xl text-gray-400 md:mx-0">
+        <p
+          className="
+            mx-auto mt-5
+            max-w-[310px]
+            text-sm leading-6
+            text-gray-400
+            sm:max-w-xl sm:text-base
+            md:mx-0 md:mt-6
+          "
+        >
           Technologies I use to design, build, animate and deploy modern web
           applications.
         </p>
       </div>
 
-      {/* 3D / Orbit area (space is reserved by min-h so nothing jumps) */}
+      {/* ==========================================
+          ORBIT
+      ========================================== */}
+
       <div
         ref={orbitRef}
-        className="relative z-10 mx-auto -mt-2 flex min-h-125 items-center justify-center md:-mt-8"
+        className="
+          relative z-10
+          mx-auto
+          -mt-2
+          flex
+          min-h-[420px]
+          items-center
+          justify-center
+          sm:min-h-[440px]
+          md:-mt-8
+          md:min-h-[500px]
+        "
       >
-        <div className="scale-[0.88] md:scale-[0.92]">
+        <div
+          className="
+            w-full
+            scale-[0.90]
+            sm:scale-[0.90]
+            md:scale-[0.92]
+          "
+        >
           {showOrbit && <SkillsOrbit />}
         </div>
       </div>
 
-      {/* Bottom hint */}
+      {/* ==========================================
+          BOTTOM HINT
+      ========================================== */}
+
       <div
         ref={hintRef}
-        className="relative z-20 mx-auto mt-10 max-w-5xl text-center md:mt-6 md:text-left"
+        className="
+          relative z-20
+          mx-auto
+          mt-2
+          max-w-5xl
+          text-center
+          md:mt-6
+          md:text-left
+        "
       >
-        <p className="text-xs tracking-[0.3em] text-gray-600">
+        <p
+          className="
+            text-[9px]
+            tracking-[0.25em]
+            text-gray-600
+            sm:text-[10px]
+            md:text-xs
+          "
+        >
           SCROLL TO EXPLORE PROJECTS
-          <span aria-hidden="true" className="ml-3 text-blue-500">
+
+          <span
+            aria-hidden="true"
+            className="ml-2 text-blue-500 sm:ml-3"
+          >
             ↓
           </span>
         </p>

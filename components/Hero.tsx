@@ -13,10 +13,6 @@ export default function Hero() {
   const heroTextRef = useRef<HTMLDivElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
 
-  /* ==========================================
-     ANIMATIONS (unchanged)
-  ========================================== */
-
   useEffect(() => {
     const mm = gsap.matchMedia();
 
@@ -33,20 +29,27 @@ export default function Hero() {
             trigger: sectionRef.current,
             start: "top top",
             end: desktop ? "bottom top" : "+=100%",
-            scrub: 1,
+            scrub: 0.6,
+            snap: {
+              snapTo: [0, 1],
+              duration: {
+                min: 0.2,
+                max: 0.6,
+              },
+              delay: 0.05,
+              ease: "power2.out",
+            },
             pin: true,
             anticipatePin: 1,
           },
         });
 
-        /*
-        ============================================================
-        DESKTOP
-        ============================================================
-        */
+        /* =========================
+           DESKTOP
+        ========================= */
 
         if (desktop) {
-          // Character moves toward the left
+          // Character movement
           tl.to(
             charRef.current,
             {
@@ -59,7 +62,7 @@ export default function Hero() {
             0,
           );
 
-          // Hero text exits
+          // Hero text exit
           tl.to(
             heroTextRef.current,
             {
@@ -70,7 +73,7 @@ export default function Hero() {
             0,
           );
 
-          // About enters from right
+          // About enters
           tl.fromTo(
             aboutRef.current,
             {
@@ -88,15 +91,12 @@ export default function Hero() {
           );
         }
 
-        /*
-        ============================================================
-        MOBILE
-        ============================================================
-        */
+        /* =========================
+           MOBILE
+        ========================= */
 
         if (mobile) {
-          /* CHARACTER */
-
+          // Character
           tl.to(
             charRef.current,
             {
@@ -109,8 +109,7 @@ export default function Hero() {
             0,
           );
 
-          /* HERO TEXT */
-
+          // Hero text
           tl.to(
             heroTextRef.current,
             {
@@ -121,13 +120,7 @@ export default function Hero() {
             0,
           );
 
-          /*
-          ABOUT
-          Important:
-          About now comes from slightly lower position.
-          This prevents it from appearing behind navbar.
-          */
-
+          // About
           tl.fromTo(
             aboutRef.current,
             {
@@ -148,10 +141,14 @@ export default function Hero() {
       sectionRef,
     );
 
-    /* Fonts/images can shift layout; recalc trigger positions */
-    document.fonts?.ready.then(() => ScrollTrigger.refresh());
+    // Refresh after fonts/images are ready
+    document.fonts?.ready.then(() => {
+      ScrollTrigger.refresh();
+    });
 
-    return () => mm.revert();
+    return () => {
+      mm.revert();
+    };
   }, []);
 
   return (
@@ -161,14 +158,11 @@ export default function Hero() {
       className="relative h-screen w-full overflow-hidden bg-[#08090d]"
     >
       {/* ==========================================================
-          CINEMATIC HERO BACKGROUND
-          next/image with priority: preloaded + optimized (this is
-          usually the LCP element). Before, it was a CSS background,
-          which the browser discovers late and Next can't optimize.
+          BACKGROUND
       ========================================================== */}
 
       <div className="pointer-events-none absolute inset-0">
-        {/* Background */}
+        {/* Background image */}
         <Image
           src="/hero-background.png"
           alt=""
@@ -195,17 +189,55 @@ export default function Hero() {
 
       <div
         ref={heroTextRef}
-        className="absolute left-6 top-[31%] z-10 -translate-y-1/2 md:left-24 md:top-1/2"
+        className="
+          absolute
+          left-6
+          top-[31%]
+          z-10
+          -translate-y-1/2
+
+          sm:left-8
+          sm:top-[32%]
+
+          md:left-20
+          md:top-1/2
+        "
       >
+        {/* Small intro */}
         <p className="mb-3 text-xs uppercase tracking-[0.35em] text-gray-400 sm:text-sm">
           Hi, I&apos;m
         </p>
 
-        <h1 className="text-5xl font-bold tracking-tight text-white sm:text-6xl md:text-8xl">
+        {/* Name */}
+        <h1
+          className="
+            text-5xl
+            font-bold
+            tracking-tight
+            text-white
+
+            sm:text-6xl
+
+            md:text-7xl
+            lg:text-7xl
+          "
+        >
           PRABHU <span className="text-blue-500">R</span>
         </h1>
 
-        <p className="mt-3 text-lg text-gray-300 sm:text-xl md:mt-4 md:text-2xl">
+        {/* Role */}
+        <p
+          className="
+            mt-3
+            text-lg
+            text-gray-300
+
+            sm:text-xl
+
+            md:mt-4
+            md:text-2xl
+          "
+        >
           Full-Stack Developer
         </p>
 
@@ -213,15 +245,51 @@ export default function Hero() {
         <a
           href="/Prabhu_R_Resume.pdf"
           download
-          className="mt-7 inline-flex items-center gap-3 rounded-full border border-blue-500/40 bg-blue-500/10 px-6 py-3 text-sm font-medium text-blue-400 transition-[background-color,border-color,color,box-shadow] duration-300 hover:border-blue-400 hover:bg-blue-500/20 hover:text-blue-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)]"
+          className="
+            mt-7
+            inline-flex
+            items-center
+            gap-3
+            rounded-full
+            border
+            border-blue-500/40
+            bg-blue-500/10
+            px-6
+            py-3
+            text-sm
+            font-medium
+            text-blue-400
+            transition-[background-color,border-color,color,box-shadow]
+            duration-300
+            hover:border-blue-400
+            hover:bg-blue-500/20
+            hover:text-blue-300
+            hover:shadow-[0_0_30px_rgba(59,130,246,0.2)]
+          "
         >
           <span>Download Resume</span>
+
           <span aria-hidden="true" className="text-lg">
             ↓
           </span>
         </a>
 
-        <p className="mt-4 max-w-77.5 text-sm leading-6 text-gray-400 sm:max-w-md sm:text-base md:mt-5 md:leading-relaxed">
+        {/* Description */}
+        <p
+          className="
+            mt-4
+            max-w-77.5
+            text-sm
+            leading-6
+            text-gray-400
+
+            sm:max-w-md
+            sm:text-base
+
+            md:mt-5
+            md:leading-relaxed
+          "
+        >
           I build scalable web applications from UI to backend and database.
         </p>
       </div>
@@ -232,7 +300,23 @@ export default function Hero() {
 
       <div
         ref={charRef}
-        className="absolute bottom-0 left-1/2 z-20 w-64 -translate-x-1/2 sm:w-72 md:left-auto md:right-[14%] md:w-110 md:translate-x-0 lg:w-125"
+        className="
+          absolute
+          bottom-0
+          left-1/2
+          z-20
+          w-64
+          -translate-x-1/2
+
+          sm:w-72
+
+          md:left-auto
+          md:right-[15%]
+          md:w-96
+          md:translate-x-0
+
+          lg:w-105
+        "
       >
         <Image
           src="/character.webp"
@@ -241,8 +325,13 @@ export default function Hero() {
           height={1536}
           priority
           fetchPriority="high"
-          sizes="(max-width: 640px) 260px, (max-width: 1024px) 440px, 500px"
-          className="h-auto w-full object-contain drop-shadow-[0_20px_45px_rgba(0,0,0,0.55)]"
+          sizes="(max-width: 640px) 260px,(max-width: 1024px) 384px,450px"
+          className="
+            h-auto
+            w-full
+            object-contain
+            drop-shadow-[0_20px_45px_rgba(0,0,0,0.55)]
+          "
         />
       </div>
 
@@ -252,15 +341,54 @@ export default function Hero() {
 
       <div
         ref={aboutRef}
-        className="absolute left-4 top-[32%] z-10 w-[calc(100%-2rem)] opacity-0 sm:left-6 sm:top-[32%] sm:w-[calc(100%-3rem)] md:left-auto md:right-20 md:top-1/2 md:w-107.5 md:-translate-y-1/2"
+        className="
+          absolute
+          left-4
+          top-[18%]
+          z-10
+          w-[calc(100%-2rem)]
+          opacity-0
+
+          sm:left-6
+          sm:top-[20%]
+          sm:w-[calc(100%-3rem)]
+
+          md:left-auto
+          md:right-20
+          md:top-1/2
+          md:w-107.5
+          md:-translate-y-1/2
+        "
       >
         {/* Label */}
-        <p className="mb-3 text-[10px] tracking-[0.3em] text-blue-400 sm:mb-4 sm:text-xs">
+        <p
+          className="
+            mb-3
+            text-[10px]
+            tracking-[0.3em]
+            text-blue-400
+
+            sm:mb-4
+            sm:text-xs
+          "
+        >
           01 — ABOUT ME
         </p>
 
         {/* Heading */}
-        <h2 className="text-[32px] font-bold leading-[1.08] tracking-tight text-white sm:text-4xl md:text-5xl">
+        <h2
+          className="
+            text-[32px]
+            font-bold
+            leading-[1.08]
+            tracking-tight
+            text-white
+
+            sm:text-4xl
+
+            md:text-5xl
+          "
+        >
           From ideas
           <br />
           to digital
@@ -269,13 +397,41 @@ export default function Hero() {
         </h2>
 
         {/* Description */}
-        <p className="mt-4 max-w-[320px] text-[13px] leading-5 text-gray-400 sm:mt-5 sm:max-w-82.5 sm:text-sm sm:leading-6 md:max-w-82.5 md:text-base md:leading-7">
+        <p
+          className="
+            mt-4
+            max-w-[320px]
+            text-[13px]
+            leading-5
+            text-gray-400
+
+            sm:mt-5
+            sm:max-w-82.5
+            sm:text-sm
+            sm:leading-6
+
+            md:max-w-82.5
+            md:text-base
+            md:leading-7
+          "
+        >
           I&apos;m a Full-Stack Developer focused on building real-world web
           applications with modern technologies.
         </p>
 
-        {/* Tech Stack */}
-        <div className="mt-5 flex max-w-82.5 flex-wrap gap-2 sm:mt-6 sm:gap-2.5">
+        {/* Tech stack */}
+        <div
+          className="
+            mt-5
+            flex
+            max-w-82.5
+            flex-wrap
+            gap-2
+
+            sm:mt-6
+            sm:gap-2.5
+          "
+        >
           {[
             "React",
             "TypeScript",
@@ -286,7 +442,22 @@ export default function Hero() {
           ].map((skill) => (
             <span
               key={skill}
-              className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] text-gray-300 sm:px-4 sm:py-2 sm:text-xs md:text-sm"
+              className="
+                rounded-full
+                border
+                border-white/10
+                bg-white/5
+                px-3
+                py-1.5
+                text-[10px]
+                text-gray-300
+
+                sm:px-4
+                sm:py-2
+                sm:text-xs
+
+                md:text-sm
+              "
             >
               {skill}
             </span>
@@ -294,7 +465,19 @@ export default function Hero() {
         </div>
 
         {/* Scroll hint */}
-        <p className="mt-5 text-[9px] tracking-[0.25em] text-gray-600 sm:mt-7 sm:text-[10px] md:text-xs">
+        <p
+          className="
+            mt-5
+            text-[9px]
+            tracking-[0.25em]
+            text-gray-600
+
+            sm:mt-7
+            sm:text-[10px]
+
+            md:text-xs
+          "
+        >
           SCROLL TO CONTINUE
         </p>
       </div>
@@ -303,13 +486,26 @@ export default function Hero() {
           SCROLL INDICATOR
       ========================================================== */}
 
-      <div className="absolute bottom-6 left-1/2 z-30 -translate-x-1/2 md:bottom-8">
+      <div
+        className="
+          absolute
+          bottom-6
+          left-1/2
+          z-30
+          -translate-x-1/2
+
+          md:bottom-8
+        "
+      >
         <div className="flex flex-col items-center gap-1.5 text-gray-500">
           <span className="text-[10px] tracking-[0.3em] sm:text-xs">
             SCROLL
           </span>
 
-          <span aria-hidden="true" className="animate-bounce text-lg sm:text-xl">
+          <span
+            aria-hidden="true"
+            className="animate-bounce text-lg sm:text-xl"
+          >
             ↓
           </span>
         </div>
