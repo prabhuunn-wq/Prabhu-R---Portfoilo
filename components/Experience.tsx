@@ -18,6 +18,49 @@ export default function Experience() {
   const transitionRef = useRef<HTMLDivElement>(null);
   const techRef = useRef<HTMLDivElement>(null);
 
+  const fitRef = useRef<HTMLDivElement>(null);
+
+  /* ==========================================
+     FIT CONTENT TO SCREEN HEIGHT (DESKTOP)
+     The section is pinned on desktop, so all the
+     content must fit in one screen. This sets
+     --fit (0.6 to 1) based on the available height.
+  ========================================== */
+
+  useEffect(() => {
+    const el = fitRef.current;
+
+    if (!el) return;
+
+    const TOP_PADDING = 112; // space for the fixed navbar
+    const BOTTOM_PADDING = 24;
+
+    const update = () => {
+      if (window.innerWidth < 1024) {
+        el.style.removeProperty("--fit");
+        return;
+      }
+
+      const available = window.innerHeight - TOP_PADDING - BOTTOM_PADDING;
+      const natural = el.offsetHeight;
+
+      if (!natural) return;
+
+      const scale = Math.min(1, Math.max(0.6, available / natural));
+
+      el.style.setProperty("--fit", scale.toFixed(3));
+    };
+
+    update();
+
+    window.addEventListener("resize", update);
+    document.fonts?.ready.then(update);
+
+    return () => {
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
   /* ==========================================
      ANIMATIONS (unchanged)
   ========================================== */
@@ -337,7 +380,7 @@ export default function Experience() {
     <section
       id="experience"
       ref={sectionRef}
-      className="relative min-h-screen overflow-hidden bg-[#05070b] px-6 py-20 md:px-12 lg:px-20"
+      className="relative min-h-screen overflow-hidden bg-[#05070b] px-6 py-20 md:px-12 lg:h-screen lg:min-h-0 lg:px-20 lg:pb-6 lg:pt-28"
     >
       {/* ==========================================
           CINEMATIC BACKGROUND
@@ -384,23 +427,28 @@ export default function Experience() {
 
       {/* ==========================================
           MAIN CONTENT
+          fitRef: scaled down on desktop (never up) so everything
+          fits inside one pinned screen. GSAP never touches this div.
       ========================================== */}
 
-      <div className="relative z-10 mx-auto max-w-5xl">
+      <div
+        ref={fitRef}
+        className="relative z-10 mx-auto max-w-5xl lg:max-w-6xl lg:origin-top lg:scale-[var(--fit,1)]"
+      >
         {/* HEADING */}
 
-        <div className="mb-12 md:mb-16">
+        <div className="mb-12 md:mb-16 lg:mb-8">
           <p className="text-xs tracking-[0.35em] text-blue-400 md:text-sm">
             04 — EXPERIENCE
           </p>
 
-          <h2 className="mt-4 text-5xl font-bold leading-[0.9] tracking-tight text-white md:text-7xl lg:text-8xl">
+          <h2 className="mt-4 text-5xl font-bold leading-[0.9] tracking-tight text-white md:text-7xl lg:mt-3 lg:text-6xl">
             My
             <br />
             <span className="text-gray-500">Journey.</span>
           </h2>
 
-          <p className="mt-6 max-w-xl text-sm leading-7 text-gray-300 md:text-base">
+          <p className="mt-6 max-w-xl text-sm leading-7 text-gray-300 md:text-base lg:mt-4">
             A journey from banking operations to building modern full-stack
             applications.
           </p>
@@ -408,7 +456,7 @@ export default function Experience() {
 
         {/* STORYTELLING AREA */}
 
-        <div className="grid min-h-162.5 grid-cols-1 gap-10 lg:grid-cols-[38%_62%] lg:gap-16">
+        <div className="grid min-h-162.5 grid-cols-1 gap-10 lg:min-h-0 lg:grid-cols-[36%_64%] lg:gap-12">
           {/* CHARACTER SIDE */}
 
           <div className="relative flex flex-col-reverse items-center justify-center gap-6 lg:block lg:min-h-0 lg:pt-20">
@@ -416,35 +464,39 @@ export default function Experience() {
 
             <div
               ref={characterRef}
-              className="relative z-20 h-72 w-44 sm:h-96 sm:w-56 md:h-107.5 md:w-62.5 lg:h-125 lg:w-72.5"
+              className="relative z-20 h-72 w-44 sm:h-96 sm:w-56 md:h-107.5 md:w-62.5 lg:mx-auto lg:h-100 lg:w-58"
             >
               <Image
                 src="/character.webp"
                 alt="Prabhu R"
                 fill
-                sizes="(max-width: 640px) 176px, (max-width: 768px) 250px, 290px"
+                sizes="(max-width: 640px) 176px, (max-width: 768px) 250px, 232px"
                 className="object-contain object-bottom drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)]"
               />
             </div>
 
-            {/* Speech Bubble: sits above the character's head */}
+            {/* Speech Bubble: sits above the character's head.
+                Outer wrapper handles position (no GSAP),
+                inner div is animated by GSAP (no Tailwind translate). */}
 
-            <div
-              ref={bubbleRef}
-              className="relative z-30 w-[85%] max-w-62.5 lg:absolute lg:left-1/2 lg:-top-17.5 lg:right-auto lg:w-75 lg:max-w-none lg:-translate-x-1/2"
-            >
-              <div className="relative rounded-2xl border border-blue-400/20 bg-[#10131b]/95 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.4)] md:bg-[#10131b]/90 md:backdrop-blur-xl">
-                {/* Bubble pointer */}
-                <div className="absolute -bottom-2 left-1/2 h-4 w-4 -translate-x-1/2 rotate-45 border-b border-r border-blue-400/20 bg-[#10131b]" />
+            <div className="relative z-30 flex w-full justify-center lg:absolute lg:inset-x-0 lg:-top-2">
+              <div
+                ref={bubbleRef}
+                className="w-[85%] max-w-62.5 lg:w-72 lg:max-w-none"
+              >
+                <div className="relative rounded-2xl border border-blue-400/20 bg-[#10131b]/95 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.4)] md:bg-[#10131b]/90 md:backdrop-blur-xl lg:p-4">
+                  {/* Bubble pointer */}
+                  <div className="absolute -bottom-2 left-1/2 h-4 w-4 -translate-x-1/2 rotate-45 border-b border-r border-blue-400/20 bg-[#10131b]" />
 
-                <p className="font-mono text-[10px] tracking-[0.25em] text-blue-400">
-                  PRABHU R
-                </p>
+                  <p className="font-mono text-[10px] tracking-[0.25em] text-blue-400">
+                    PRABHU R
+                  </p>
 
-                <p className="mt-3 text-sm leading-6 text-gray-300">
-                  I started my professional journey in banking, working with
-                  customers and handling day-to-day banking operations.
-                </p>
+                  <p className="mt-3 text-sm leading-6 text-gray-300 lg:mt-2 lg:text-[13px]">
+                    I started my professional journey in banking, working with
+                    customers and handling day-to-day banking operations.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -456,7 +508,7 @@ export default function Experience() {
 
             <div
               ref={bankingRef}
-              className="rounded-3xl border border-white/10 bg-black/40 p-7 md:bg-black/30 md:p-10 md:backdrop-blur-xl"
+              className="rounded-3xl border border-white/10 bg-black/40 p-7 md:bg-black/30 md:p-10 md:backdrop-blur-xl lg:p-8"
             >
               <div className="flex items-start justify-between gap-5">
                 <div>
@@ -464,32 +516,32 @@ export default function Experience() {
                     PROFESSIONAL EXPERIENCE
                   </p>
 
-                  <h3 className="mt-4 text-3xl font-bold text-white md:text-4xl">
+                  <h3 className="mt-4 text-3xl font-bold text-white md:text-4xl lg:mt-3 lg:text-3xl">
                     Assistant Manager
                   </h3>
 
-                  <p className="mt-2 text-lg text-gray-400">
+                  <p className="mt-2 text-lg text-gray-400 lg:text-base">
                     Kotak Mahindra Bank
                   </p>
                 </div>
 
                 <span
                   aria-hidden="true"
-                  className="font-mono text-4xl font-bold text-white/10 md:text-6xl"
+                  className="font-mono text-4xl font-bold text-white/10 md:text-6xl lg:text-5xl"
                 >
                   01
                 </span>
               </div>
 
-              <div className="mt-8 h-px bg-white/10" />
+              <div className="mt-8 h-px bg-white/10 lg:mt-5" />
 
-              <p className="mt-7 max-w-2xl text-sm leading-7 text-gray-300 md:text-base">
+              <p className="mt-7 max-w-2xl text-sm leading-7 text-gray-300 md:text-base lg:mt-4 lg:text-sm">
                 Worked in customer relationship management and banking
                 operations, handling customer requirements and day-to-day
                 banking processes.
               </p>
 
-              <div className="mt-7 flex flex-wrap gap-3">
+              <div className="mt-7 flex flex-wrap gap-3 lg:mt-4 lg:gap-2.5">
                 {[
                   "Customer Relationship Management",
                   "Banking Operations",
@@ -497,7 +549,7 @@ export default function Experience() {
                 ].map((item) => (
                   <span
                     key={item}
-                    className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-gray-300"
+                    className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-gray-300 lg:py-1.5"
                   >
                     {item}
                   </span>
@@ -509,7 +561,7 @@ export default function Experience() {
 
             <div
               ref={transitionRef}
-              className="mt-8 rounded-3xl border border-blue-500/20 bg-blue-500/5 p-7 md:p-10 md:backdrop-blur-xl"
+              className="mt-8 rounded-3xl border border-blue-500/20 bg-blue-500/5 p-7 md:p-10 md:backdrop-blur-xl lg:mt-5 lg:p-8"
             >
               <div className="flex items-start justify-between gap-5">
                 <div>
@@ -517,7 +569,7 @@ export default function Experience() {
                     THE TRANSITION
                   </p>
 
-                  <h3 className="mt-4 text-3xl font-bold text-white md:text-4xl">
+                  <h3 className="mt-4 text-3xl font-bold text-white md:text-4xl lg:mt-3 lg:text-3xl">
                     From Banking
                     <br />
                     <span className="text-gray-500">to Technology.</span>
@@ -526,13 +578,13 @@ export default function Experience() {
 
                 <span
                   aria-hidden="true"
-                  className="font-mono text-4xl font-bold text-blue-400/10 md:text-6xl"
+                  className="font-mono text-4xl font-bold text-blue-400/10 md:text-6xl lg:text-5xl"
                 >
                   02
                 </span>
               </div>
 
-              <p className="mt-6 max-w-2xl text-sm leading-7 text-gray-300 md:text-base">
+              <p className="mt-6 max-w-2xl text-sm leading-7 text-gray-300 md:text-base lg:mt-4 lg:text-sm">
                 Developed my skills in modern web technologies and moved
                 towards full-stack development, building real-world
                 applications across frontend, backend and databases.
@@ -540,12 +592,12 @@ export default function Experience() {
 
               {/* TECHNOLOGY STACK */}
 
-              <div ref={techRef} className="mt-8">
-                <p className="mb-4 font-mono text-[10px] tracking-[0.25em] text-gray-500">
+              <div ref={techRef} className="mt-8 lg:mt-5">
+                <p className="mb-4 font-mono text-[10px] tracking-[0.25em] text-gray-500 lg:mb-3">
                   CURRENT TECHNOLOGY STACK
                 </p>
 
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3 lg:gap-2.5">
                   {[
                     "React",
                     "TypeScript",
@@ -556,7 +608,7 @@ export default function Experience() {
                   ].map((skill) => (
                     <span
                       key={skill}
-                      className="rounded-full border border-blue-500/20 bg-blue-500/5 px-4 py-2 text-xs text-blue-300 transition-[background-color,border-color] duration-300 hover:border-blue-400/50 hover:bg-blue-500/10"
+                      className="rounded-full border border-blue-500/20 bg-blue-500/5 px-4 py-2 text-xs text-blue-300 transition-[background-color,border-color] duration-300 hover:border-blue-400/50 hover:bg-blue-500/10 lg:py-1.5"
                     >
                       {skill}
                     </span>
@@ -569,7 +621,7 @@ export default function Experience() {
 
         {/* BOTTOM HINT */}
 
-        <div className="mt-10 flex items-center justify-center gap-3">
+        <div className="mt-10 flex items-center justify-center gap-3 lg:mt-4">
           <div className="h-px w-12 bg-white/10" />
 
           <p className="font-mono text-[10px] tracking-[0.25em] text-gray-500">
