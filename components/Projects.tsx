@@ -348,13 +348,13 @@ export default function Projects() {
           03 — PROJECTS
         </p>
 
-        <h2 className="mt-5 text-5xl font-bold leading-[0.95] tracking-tight text-white md:text-7xl lg:text-8xl">
+        <h2 className="mt-5 text-5xl font-bold leading-[0.95] tracking-tight text-white md:mt-4 md:text-6xl lg:text-7xl">
           Things I&apos;ve
           <br />
           <span className="text-gray-500">Built.</span>
         </h2>
 
-        <p className="mt-7 max-w-xl text-base leading-7 text-gray-400 md:text-lg">
+        <p className="mt-7 max-w-xl text-base leading-7 text-gray-400 md:mt-5 md:text-base">
           Real-world applications built across frontend, backend, databases
           and third-party integrations.
         </p>
@@ -364,7 +364,7 @@ export default function Projects() {
           PROJECT STORY
       ========================================== */}
 
-      <div className="relative z-10 mx-auto mt-24 max-w-7xl space-y-32">
+      <div className="relative z-10 mx-auto mt-24 max-w-6xl space-y-32 md:mt-14 md:space-y-20">
         {projects.map((project, index) => (
           <div
             key={project.title}
@@ -385,7 +385,7 @@ export default function Projects() {
                 handleCardMouseLeave(card);
               }
             }}
-            className="project-card group relative min-h-162.5 overflow-visible rounded-3xl border border-white/10 bg-[#0d1017]/95 p-8 shadow-[0_30px_100px_rgba(0,0,0,0.45)] will-change-transform md:bg-[#0d1017]/90 md:p-14 md:backdrop-blur-sm"
+            className="project-card group relative min-h-162.5 overflow-visible rounded-3xl border border-white/10 bg-[#0d1017]/95 p-8 shadow-[0_30px_100px_rgba(0,0,0,0.45)] will-change-transform md:min-h-0 md:bg-[#0d1017]/90 md:p-10 md:backdrop-blur-sm"
             style={{
               transformStyle: "preserve-3d",
             }}
@@ -396,7 +396,7 @@ export default function Projects() {
             {/* BIG NUMBER */}
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute right-5 top-5 text-[70px] font-bold leading-none text-white/4 sm:top-6 sm:text-[100px] md:right-10 md:top-8 md:text-[180px]"
+              className="pointer-events-none absolute right-5 top-5 text-[70px] font-bold leading-none text-white/4 sm:top-6 sm:text-[100px] md:right-8 md:top-6 md:text-[120px]"
             >
               {project.number}
             </div>
@@ -411,24 +411,24 @@ export default function Projects() {
                 on mobile and desktop.
             ========================================== */}
 
-            <div className="relative z-10 grid min-h-160 grid-cols-1 gap-12 md:grid-cols-[42%_58%] md:items-center md:gap-8 lg:min-h-140">
+            <div className="relative z-10 grid min-h-160 grid-cols-1 gap-12 md:min-h-0 md:grid-cols-[38%_62%] md:items-center md:gap-8">
               {/* CHARACTER SIDE: always first */}
 
               <div className="relative order-1 flex min-h-125 items-end justify-center md:min-h-0">
                 {/* CHARACTER STAGE: bubble stacked above the character */}
 
-                <div className="relative flex w-full max-w-70 flex-col items-center justify-end gap-6 lg:max-w-70">
+                <div className="relative flex w-full max-w-70 flex-col items-center justify-end gap-6 md:gap-4">
                   {/* SPEECH BUBBLE */}
 
                   <div
                     ref={(el) => {
                       bubblesRef.current[index] = el;
                     }}
-                    className="relative z-30 w-65 rounded-2xl border border-blue-500/20 bg-[#10131b]/95 p-5 shadow-[0_20px_70px_rgba(0,0,0,0.55)] sm:w-70 md:w-75 md:backdrop-blur-xl lg:w-[320px]"
+                    className="relative z-30 w-65 rounded-2xl border border-blue-500/20 bg-[#10131b]/95 p-5 shadow-[0_20px_70px_rgba(0,0,0,0.55)] sm:w-70 md:w-68 md:p-4 md:backdrop-blur-xl lg:w-72"
                   >
                     {/* Bubble header */}
 
-                    <div className="mb-3 flex items-center gap-2">
+                    <div className="mb-3 flex items-center gap-2 md:mb-2">
                       <span className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.9)]" />
 
                       <span className="text-[10px] font-medium tracking-[0.25em] text-blue-400">
@@ -440,11 +440,11 @@ export default function Projects() {
                       PROJECT {project.number}
                     </p>
 
-                    <p className="mt-1 text-lg font-semibold text-white">
+                    <p className="mt-1 text-lg font-semibold text-white md:text-base">
                       {project.title}
                     </p>
 
-                    <p className="mt-3 text-sm leading-6 text-gray-300">
+                    <p className="mt-3 text-sm leading-6 text-gray-300 md:mt-2 md:text-[13px]">
                       {project.explanation}
                     </p>
 
@@ -459,14 +459,14 @@ export default function Projects() {
                     ref={(el) => {
                       charactersRef.current[index] = el;
                     }}
-                    className="relative z-20 w-44 sm:w-48 md:w-56 lg:w-60"
+                    className="relative z-20 w-44 sm:w-48 md:w-36 lg:w-44"
                     style={{ aspectRatio: "1024 / 1536" }}
                   >
                     <Image
                       src="/character.webp"
                       alt={`Prabhu explaining ${project.title}`}
                       fill
-                      sizes="(max-width: 640px) 176px, (max-width: 768px) 192px, (max-width: 1024px) 224px, 240px"
+                      sizes="(max-width: 640px) 176px, (max-width: 768px) 192px, 176px"
                       className="relative z-10 object-contain object-bottom opacity-100 drop-shadow-[0_20px_45px_rgba(0,0,0,0.6)]"
                     />
 
@@ -487,34 +487,34 @@ export default function Projects() {
 
                 {/* Title */}
 
-                <h3 className="mt-5 text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
+                <h3 className="mt-5 text-4xl font-bold tracking-tight text-white sm:text-5xl md:mt-3 md:text-5xl lg:text-6xl">
                   {project.title}
                 </h3>
 
                 {/* Subtitle */}
 
-                <p className="mt-3 text-base text-gray-500 sm:text-lg md:text-xl">
+                <p className="mt-3 text-base text-gray-500 sm:text-lg md:mt-2 md:text-lg">
                   {project.subtitle}
                 </p>
 
                 {/* Description */}
 
-                <p className="mt-6 max-w-2xl text-sm leading-7 text-gray-400 sm:text-base md:mt-8 md:text-lg md:leading-8">
+                <p className="mt-6 max-w-2xl text-sm leading-7 text-gray-400 sm:text-base md:mt-5 md:text-base md:leading-7">
                   {project.description}
                 </p>
 
                 {/* TECH STACK */}
 
-                <div className="mt-8 md:mt-10">
-                  <p className="mb-4 text-[10px] tracking-[0.3em] text-gray-600">
+                <div className="mt-8 md:mt-6">
+                  <p className="mb-4 text-[10px] tracking-[0.3em] text-gray-600 md:mb-3">
                     TECHNOLOGY
                   </p>
 
-                  <div className="flex flex-wrap gap-2.5 md:gap-3">
+                  <div className="flex flex-wrap gap-2.5 md:gap-2">
                     {project.stack.map((tech) => (
                       <span
                         key={tech}
-                        className="rounded-full border border-white/10 bg-white/3 px-3 py-1.5 text-[11px] text-gray-400 transition-colors duration-300 group-hover:border-blue-500/30 group-hover:text-gray-200 sm:px-4 sm:py-2 sm:text-xs md:text-sm"
+                        className="rounded-full border border-white/10 bg-white/3 px-3 py-1.5 text-[11px] text-gray-400 transition-colors duration-300 group-hover:border-blue-500/30 group-hover:text-gray-200 sm:px-4 sm:py-2 sm:text-xs md:px-3.5 md:py-1.5"
                       >
                         {tech}
                       </span>
@@ -524,14 +524,14 @@ export default function Projects() {
 
                 {/* PROJECT LINKS */}
 
-                <div className="mt-8 flex flex-wrap gap-3 md:mt-10 md:gap-4">
+                <div className="mt-8 flex flex-wrap gap-3 md:mt-6">
                   {/* Live Project */}
 
                   <a
                     href={project.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group/link inline-flex items-center gap-3 rounded-full border border-blue-500/40 bg-blue-500/10 px-5 py-2.5 text-sm font-medium text-blue-400 transition-[background-color,border-color,color,box-shadow] duration-300 hover:border-blue-400 hover:bg-blue-500/20 hover:text-blue-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] sm:px-6 sm:py-3"
+                    className="group/link inline-flex items-center gap-3 rounded-full border border-blue-500/40 bg-blue-500/10 px-5 py-2.5 text-sm font-medium text-blue-400 transition-[background-color,border-color,color,box-shadow] duration-300 hover:border-blue-400 hover:bg-blue-500/20 hover:text-blue-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] sm:px-6 sm:py-3 md:px-5 md:py-2.5"
                   >
                     <span>Live Project</span>
 
@@ -548,7 +548,7 @@ export default function Projects() {
                     href={project.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group/github inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-gray-300 transition-[background-color,border-color,color] duration-300 hover:border-white/20 hover:bg-white/10 hover:text-white sm:px-6 sm:py-3"
+                    className="group/github inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-gray-300 transition-[background-color,border-color,color] duration-300 hover:border-white/20 hover:bg-white/10 hover:text-white sm:px-6 sm:py-3 md:px-5 md:py-2.5"
                   >
                     <FaGithub
                       size={17}
@@ -562,7 +562,7 @@ export default function Projects() {
 
                 {/* PROJECT INDICATOR */}
 
-                <div className="mt-10 flex items-center gap-4 md:mt-12">
+                <div className="mt-10 flex items-center gap-4 md:mt-7">
                   <span className="h-px w-12 bg-blue-500 transition-[width] duration-500 group-hover:w-20" />
 
                   <span className="text-xs tracking-[0.3em] text-gray-500">
@@ -589,7 +589,7 @@ export default function Projects() {
           BOTTOM HINT
       ========================================== */}
 
-      <div className="relative z-10 mx-auto mt-28 max-w-7xl">
+      <div className="relative z-10 mx-auto mt-28 max-w-6xl md:mt-16">
         <p className="text-xs tracking-[0.3em] text-gray-600">
           SCROLL TO CONTINUE
           <span aria-hidden="true" className="ml-3 text-blue-500">
