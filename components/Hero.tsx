@@ -42,6 +42,7 @@ export default function Hero() {
             },
             pin: true,
             anticipatePin: 1,
+            invalidateOnRefresh: true,
           },
         });
 
@@ -162,12 +163,14 @@ export default function Hero() {
       sectionRef,
     );
 
-    // Refresh after fonts/images are ready
-    document.fonts?.ready.then(() => {
-      ScrollTrigger.refresh();
-    });
+    // Refresh after fonts/images/page are fully ready
+    const refresh = () => ScrollTrigger.refresh();
+
+    document.fonts?.ready.then(refresh);
+    window.addEventListener("load", refresh);
 
     return () => {
+      window.removeEventListener("load", refresh);
       mm.revert();
     };
   }, []);
@@ -206,166 +209,180 @@ export default function Hero() {
 
       {/* ==========================================================
           HERO TEXT
-          (desktop: full-height flex column, content centered)
+          Outer wrapper = position only (no GSAP)
+          Inner div     = animated by GSAP (no Tailwind translate)
+          Mobile: wrapper spans top 0 → 62%, content centered => center at 31%
       ========================================================== */}
 
       <div
-        ref={heroTextRef}
         className="
+          pointer-events-none
           absolute
           left-6
-          top-[31%]
+          top-0
           z-10
-          -translate-y-1/2
+          flex
+          h-[62%]
+          flex-col
+          justify-center
 
           sm:left-8
-          sm:top-[32%]
+          sm:h-[64%]
 
           md:left-20
-          md:top-0
-          md:flex
           md:h-full
-          md:translate-y-0
-          md:flex-col
-          md:justify-center
         "
       >
-        {/* Small intro */}
-        <p className="mb-3 text-xs uppercase tracking-[0.35em] text-gray-400 sm:text-sm">
-          Hi, I&apos;m
-        </p>
+        <div ref={heroTextRef} className="pointer-events-auto">
+          {/* Small intro */}
+          <p className="mb-3 text-xs uppercase tracking-[0.35em] text-gray-400 sm:text-sm">
+            Hi, I&apos;m
+          </p>
 
-        {/* Name */}
-        <h1
-          className="
-            text-5xl
-            font-bold
-            tracking-tight
-            text-white
+          {/* Name */}
+          <h1
+            className="
+              text-5xl
+              font-bold
+              tracking-tight
+              text-white
 
-            sm:text-6xl
+              sm:text-6xl
 
-            md:text-7xl
-            lg:text-7xl
-          "
-        >
-          PRABHU <span className="text-blue-500">R</span>
-        </h1>
+              md:text-7xl
+              lg:text-7xl
+            "
+          >
+            PRABHU <span className="text-blue-500">R</span>
+          </h1>
 
-        {/* Role */}
-        <p
-          className="
-            mt-3
-            text-lg
-            text-gray-300
+          {/* Role */}
+          <p
+            className="
+              mt-3
+              text-lg
+              text-gray-300
 
-            sm:text-xl
+              sm:text-xl
 
-            md:mt-4
-            md:text-2xl
-          "
-        >
-          Full-Stack Developer
-        </p>
+              md:mt-4
+              md:text-2xl
+            "
+          >
+            Full-Stack Developer
+          </p>
 
-        {/* Resume */}
-        <a
-          href="/Prabhu_R_Resume.pdf"
-          download
-          className="
-            mt-7
-            inline-flex
-            w-fit
-            items-center
-            gap-3
-            rounded-full
-            border
-            border-blue-500/40
-            bg-blue-500/10
-            px-6
-            py-3
-            text-sm
-            font-medium
-            text-blue-400
-            transition-[background-color,border-color,color,box-shadow]
-            duration-300
-            hover:border-blue-400
-            hover:bg-blue-500/20
-            hover:text-blue-300
-            hover:shadow-[0_0_30px_rgba(59,130,246,0.2)]
-          "
-        >
-          <span>Download Resume</span>
+          {/* Resume */}
+          <a
+            href="/Prabhu_R_Resume.pdf"
+            download
+            className="
+              mt-7
+              inline-flex
+              w-fit
+              items-center
+              gap-3
+              rounded-full
+              border
+              border-blue-500/40
+              bg-blue-500/10
+              px-6
+              py-3
+              text-sm
+              font-medium
+              text-blue-400
+              transition-[background-color,border-color,color,box-shadow]
+              duration-300
+              hover:border-blue-400
+              hover:bg-blue-500/20
+              hover:text-blue-300
+              hover:shadow-[0_0_30px_rgba(59,130,246,0.2)]
+            "
+          >
+            <span>Download Resume</span>
 
-          <span aria-hidden="true" className="text-lg">
-            ↓
-          </span>
-        </a>
+            <span aria-hidden="true" className="text-lg">
+              ↓
+            </span>
+          </a>
 
-        {/* Description */}
-        <p
-          className="
-            mt-4
-            max-w-77.5
-            text-sm
-            leading-6
-            text-gray-400
+          {/* Description */}
+          <p
+            className="
+              mt-4
+              max-w-77.5
+              text-sm
+              leading-6
+              text-gray-400
 
-            sm:max-w-md
-            sm:text-base
+              sm:max-w-md
+              sm:text-base
 
-            md:mt-5
-            md:leading-relaxed
-          "
-        >
-          I build scalable web applications from UI to backend and database.
-        </p>
+              md:mt-5
+              md:leading-relaxed
+            "
+          >
+            I build scalable web applications from UI to backend and database.
+          </p>
+        </div>
       </div>
 
       {/* ==========================================================
           CHARACTER
+          Outer wrapper = position only (no GSAP)
+          Inner div     = animated by GSAP
       ========================================================== */}
 
       <div
-        ref={charRef}
         className="
+          pointer-events-none
           absolute
+          inset-x-0
           bottom-0
-          left-1/2
           z-20
-          w-64
-          -translate-x-1/2
+          flex
+          justify-center
 
-          sm:w-72
-
-          md:left-auto
+          md:inset-x-auto
           md:right-[15%]
+          md:block
           md:w-96
-          md:translate-x-0
 
           lg:w-105
         "
       >
-        <Image
-          src="/character.webp"
-          alt="Prabhu R"
-          width={1024}
-          height={1536}
-          priority
-          fetchPriority="high"
-          sizes="(max-width: 640px) 260px,(max-width: 1024px) 384px,450px"
+        <div
+          ref={charRef}
           className="
-            h-auto
-            w-full
-            object-contain
-            drop-shadow-[0_20px_45px_rgba(0,0,0,0.55)]
+            w-64
+
+            sm:w-72
+
+            md:w-full
           "
-        />
+        >
+          <Image
+            src="/character.webp"
+            alt="Prabhu R"
+            width={1024}
+            height={1536}
+            priority
+            fetchPriority="high"
+            sizes="(max-width: 640px) 260px,(max-width: 1024px) 384px,450px"
+            className="
+              h-auto
+              w-full
+              object-contain
+              drop-shadow-[0_20px_45px_rgba(0,0,0,0.55)]
+            "
+          />
+        </div>
       </div>
 
       {/* ==========================================================
           ABOUT CONTENT
-          (desktop: full-height flex column, content centered)
+          Desktop: full-height flex column, content centered
+          (no Tailwind translate, GSAP owns the transform)
       ========================================================== */}
 
       <div
@@ -516,21 +533,26 @@ export default function Hero() {
 
       {/* ==========================================================
           SCROLL INDICATOR
+          Wrapper is static; inner div is faded by GSAP
       ========================================================== */}
 
       <div
-        ref={scrollHintRef}
         className="
+          pointer-events-none
           absolute
+          inset-x-0
           bottom-6
-          left-1/2
           z-30
-          -translate-x-1/2
+          flex
+          justify-center
 
           md:bottom-8
         "
       >
-        <div className="flex flex-col items-center gap-1.5 text-gray-500">
+        <div
+          ref={scrollHintRef}
+          className="flex flex-col items-center gap-1.5 text-gray-500"
+        >
           <span className="text-[10px] tracking-[0.3em] sm:text-xs">
             SCROLL
           </span>
